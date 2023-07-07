@@ -28,8 +28,8 @@ async def on_message(message):
 
  #   await message.channel.send("Hello World")
 
-    for channel in bot.get_all_channels():
-        if isinstance(channel, discord.TextChannel):
-            await channel.send(f'Message received: {message.content}')
+  #  for channel in bot.get_all_channels():
+  #      if isinstance(channel, discord.TextChannel):
+  #          await channel.send(f'Message received: {message.content}')
 
 bot.run(bot_token)
