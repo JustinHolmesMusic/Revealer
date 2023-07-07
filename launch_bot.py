@@ -1,6 +1,6 @@
-
 import discord
 from discord.ext import commands
+from message_parser import parse_message
 import os
 
 import dotenv
@@ -22,6 +22,11 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
+    if not message.channel.name in ("test-bot", "vegetables"):
+        return
+    await parse_message(message=message)
+
+ #   await message.channel.send("Hello World")
 
     for channel in bot.get_all_channels():
         if isinstance(channel, discord.TextChannel):
