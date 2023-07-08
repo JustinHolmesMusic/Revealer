@@ -17,7 +17,7 @@ def receiver(accounts):
     return accounts[1]
 
 @pytest.fixture(scope='session', autouse=True)
-def vowelsounds_contract(project, owner, countdownPeriod, threshold, receiver):
+def contribution(project, owner, countdownPeriod, threshold, receiver):
     vowelsounds_contracts_dependency_api = project.dependencies["contribution-contracts"]
     # simply use first entry - could be from github ('main') or local ('local')
     _, vowelsounds_contracts = list(vowelsounds_contracts_dependency_api.items())[0]
