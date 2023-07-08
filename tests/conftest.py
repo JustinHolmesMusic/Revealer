@@ -6,15 +6,15 @@ from nucypher.policy.conditions.lingo import ConditionLingo
 from nucypher.policy.conditions.evm import _CONDITION_CHAINS
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def owner(accounts):
     return accounts[0]
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def receiver(accounts):
     return accounts[1]
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def not_owner(accounts):
     return accounts[2]
 
@@ -30,10 +30,11 @@ def threshold():
 def contribution(project, receiver, owner, countdownPeriod, threshold):
     return owner.deploy(project.Contribution, countdownPeriod, threshold, receiver)
 
+@pytest.fixture
 def coordinator_provider_uri():
     return "tester://pyevm"
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def coordinator_network():
     return "lynx"
     
@@ -41,7 +42,7 @@ def coordinator_network():
 def ritual_id():
     return 0
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture
 def contract_address(contribution):
     return contribution.address
 
