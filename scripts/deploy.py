@@ -9,8 +9,9 @@ def main(account_id=None):
 
     coordinator = project.TestnetContribution.deploy(
         120,
-        Web3.to_wei(1, 'ether'),
+        Web3.to_wei(0.1, 'ether'),
         deployer,
+        True,  # testnet mode
         sender=deployer,
         publish=True,
     )
