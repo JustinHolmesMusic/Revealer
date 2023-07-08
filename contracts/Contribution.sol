@@ -81,11 +81,6 @@ contract Contribution {
 
     function withdraw() external onlyBeneficiary {
         require(deadline < block.timestamp, "Cannot withdraw funds before deadline");
-
-        if (materialReleaseConditionMet) {
-            require(keyPlaintext.length > 0, "Material has been released but key has not been revealed.");
-        }
-
         beneficiary.transfer(address(this).balance);
         emit Withdraw(beneficiary, address(this).balance);
     }

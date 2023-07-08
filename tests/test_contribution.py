@@ -29,6 +29,10 @@ def test_set_secret(contribution: ape.Contract, owner: ape.Account, not_owner: a
 
     assert contribution.isKeySet() == True
 
+    # cannot set secret twice
+    with ape.reverts("Key already set."):
+        contribution.commitSecret(dummy_key_hash, dummy_key_ciphertext_base64, sender=owner)
+
 
 @pytest.mark.usefixtures("commit_secret")
 def test_reveal_secret(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, dummy_key_base64, dummy_key_hash, threshold: int):
