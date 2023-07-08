@@ -5,7 +5,20 @@ plugins:
 solidity:
   version: 0.8.20
   evm_version: paris
+  import_remapping:
+    - "@openzeppelin/contracts=openzeppelin/v4.9.1"
+    - "@openzeppelin-upgradeable/contracts=openzeppelin-upgradeable/v4.9.1"
+
+
 
 test:
   mnemonic: test test test test test test test test test test test junk
   number_of_accounts: 5
+
+dependencies:
+  - name: openzeppelin
+    github: OpenZeppelin/openzeppelin-contracts
+    version: 4.9.1
+  - name: openzeppelin-upgradeable
+    github: OpenZeppelin/openzeppelin-contracts-upgradeable
+    version: 4.9.1

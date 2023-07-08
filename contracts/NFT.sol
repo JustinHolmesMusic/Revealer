@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -19,7 +20,7 @@ contract VowelSoundsNFT is ERC721URIStorage, Ownable {
         require(members[msg.sender], "Only members can mint NFTs");
         require(!_hasMinted[msg.sender], "Address has already minted an NFT");
         _safeMint(msg.sender, _tokenIdCounter);
-        _setTokenURI(_tokenIdCounter, "https://vowelsoundsnft.com/metadata/" + string(abi.encodePacked(_tokenIdCounter)));
+        _setTokenURI(_tokenIdCounter, string(abi.encodePacked("https://vowelsoundsnft.com/metadata/", Strings.toString(_tokenIdCounter))));
         _tokenIdCounter++;
         _hasMinted[msg.sender] = true;
     }
