@@ -14,6 +14,8 @@ contract Contribution {
     bytes public keyCiphertext;
     bytes public keyPlaintext;
 
+    bool testnet;
+
     mapping(address => uint256) public amountContributedByAddress;
 
     event Contribute(address indexed contributor, uint256 amount);
@@ -23,13 +25,15 @@ contract Contribution {
     constructor(
         uint256 _countdownPeriod,
         uint256 _threshold,
-        address payable _beneficiary
+        address payable _beneficiary,
+        bool _testnet
     ) {
         countdownPeriod = _countdownPeriod;
         deadline = block.timestamp + _countdownPeriod;
         owner = payable(msg.sender);
         threshold = _threshold;
         beneficiary = _beneficiary;
+        testnet = _testnet;
     }
 
     modifier onlyOwner() {
@@ -43,6 +47,21 @@ contract Contribution {
             "Only the beneficiary can call this function."
         );
         _;
+    }
+
+    function resetClock() external onlyOwner {
+        require(testnet, "This function is only available on testnet.");
+        deadline = block.timestamp + countdownPeriod;
+    }
+
+    function setMaterialReleaseConditionMet(bool status) external onlyOwner {
+        require(testnet, "This function is only available on testnet.");
+        materialReleaseConditionMet = status;
+    }
+
+    function setThreshold(uint256 _threshold) external onlyOwner {
+        require(testnet, "This function is only available on testnet.");
+        threshold = _threshold;
     }
 
     function commitSecret(bytes32 _hash, bytes memory _ciphertext) external onlyOwner {
@@ -71,7 +90,6 @@ contract Contribution {
         }
 
         deadline = block.timestamp + countdownPeriod;
-
         emit Contribute(msg.sender, msg.value);
     }
 
@@ -83,5 +101,11 @@ contract Contribution {
         require(deadline < block.timestamp, "Cannot withdraw funds before deadline");
         beneficiary.transfer(address(this).balance);
         emit Withdraw(beneficiary, address(this).balance);
+    }
+
+    function bridgeContributor(address member) internal onlyOwner {
+        bytes4 methodSelector = bytes4(keccak256(bytes('addMember(address, value)')));
+        bytes memory data = abi.encodeWithSelector(methodSelector, member);
+        amb.call(abi.encodeWithSignature('requireToPassMessage(address,bytes,uint256)', destContract, data, 141000));
     }
 }
