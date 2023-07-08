@@ -77,17 +77,29 @@ eth_balance_condition = {
     },
 }
 
-message = "hello world".encode()
-ciphertext = enrico.encrypt_for_dkg(plaintext=message, conditions=eth_balance_condition)
+ciphertext_of_sym_key = enrico.encrypt_for_dkg(plaintext=plaintext_of_sym_key,
+                                               conditions=eth_balance_condition)
 
 tmk = {
-    'ciphertext': base64.b64encode(bytes(ciphertext)).decode(),
-    'conditions': eth_balance_condition
+    'bulk_ciphertext': base64.b64encode(bytes(bulk_ciphertext)).decode(),  # Encrypted Tony
+    'encrypted_sym_key': bytes(ciphertext_of_sym_key).hex(),
+    'conditions': eth_balance_condition,
+    'filename': 'manzana.mp3'
 }
+
+################
+# Sanity check #
+################
+
+f = Fernet(plaintext_of_sym_key)
+hopefully_tony = f.decrypt(bulk_ciphertext)
+assert hopefully_tony == definitely_tony
+
+##################
 
 tmk_json = json.dumps(tmk)
 
-filename = 'example.tmk'
+filename = 'tony.tmk'
 with open(filename, 'w') as file:
     data = tmk_json
     file.write(data)
