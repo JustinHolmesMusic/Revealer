@@ -1,0 +1,11 @@
+name: revealer
+plugins:
+  - name: solidity
+
+solidity:
+  version: 0.8.20
+  evm_version: paris
+
+test:
+  mnemonic: test test test test test test test test test test test junk
+  number_of_accounts: 5
