@@ -43,23 +43,34 @@ async def parse_message(message):
             tdr = ThresholdDecryptionRequest.from_bytes(bytes(attachment_response.content))
         except:
             await message.reply("wrong file type")
-            return
-        
-        cohort = bob._dkg_insight.fake_ritual.fake_nodes
+            return      
+        print("--------- Threshold Decryption ---------")
+
+        bob = Bob(
+            eth_provider_uri=staking_provider_uri,
+            domain=network,
+            coordinator_provider_uri=coordinator_provider_uri,
+            coordinator_network=coordinator_network,
+            registry=InMemoryContractRegistry.from_latest_publication(network=network),
+        )
+
+        bob.start_learning_loop(now=True)
+
+        #### Nonsense
+        ritual = self.get_ritual_from_id(15)
+        cohort = self.resolve_cohort(ritual=ritual, timeout=20)
+
+
+
 
         cleartext_from_ciphertext = bob.decrypt_using_existing_decryption_request(
-        tdr,
-        participant_public_keys=bob._dkg_insight.fake_ritual.participant_public_keys,
-        cohort=cohort,
-        threshold=1,
-        )   
+            tdr,
+            participant_public_keys=ritual.participant_public_keys,
+            cohort=cohort,
+            threshold=1,
+        )
 
-        decoded_cleartext_from_ciphertext = bytes(cleartext_from_ciphertext)
-        decoded_cleartext_from_tdr = bytes(cleartest_from_tdr)
-
-        assert decoded_cleartext_from_ciphertext == plaintext
-        assert plaintext == decoded_cleartext_from_tdr
-        print(f"Decrypted cleartext: {decoded_cleartext_from_ciphertext}")
+        print(bytes(cleartext).decode())
 
 
      

@@ -1,33 +1,74 @@
-from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
+import os
+import base64
+import json
+from nucypher_core.ferveo import DkgPublicKey
+
+from nucypher.blockchain.eth.agents import CoordinatorAgent
+from nucypher.blockchain.eth.registry import InMemoryContractRegistry
+from nucypher.characters.lawful import Bob, Enrico
 from nucypher.policy.conditions.lingo import ConditionLingo
+from nucypher.utilities.logging import GlobalLoggerSettings
 
+######################
+# Boring setup stuff #
+######################
 
-plaintext = b"paz al amanecer"
-THIS_IS_NOT_A_TRINKET = 55  # sometimes called "public key"
+LOG_LEVEL = "info"
+GlobalLoggerSettings.set_log_level(log_level_name=LOG_LEVEL)
+GlobalLoggerSettings.start_console_logging()
 
-enrico = _Enrico(encrypting_key=THIS_IS_NOT_A_TRINKET)
+staking_provider_uri = 
+network = "lynx"
 
-ANYTHING_CAN_BE_PASSED_AS_RITUAL_ID = 55
+coordinator_provider_uri = 
+coordinator_network = "mumbai"
 
-before_the_beginning_of_time = {
+###############
+# Enrico
+###############
+
+print("--------- Threshold Encryption ---------")
+
+coordinator_agent = CoordinatorAgent(
+    provider_uri=coordinator_provider_uri,
+    registry=InMemoryContractRegistry.from_latest_publication(
+        network=coordinator_network
+    ),
+)
+ritual_id = 15  # got this from a side channel
+ritual = coordinator_agent.get_ritual(ritual_id)
+enrico = Enrico(encrypting_key=DkgPublicKey.from_bytes(bytes(ritual.public_key)))
+
+print(
+    f"Fetched DKG public key {bytes(enrico.policy_pubkey).hex()} "
+    f"for ritual #{ritual_id} "
+    f"from Coordinator {coordinator_agent.contract.address}"
+)
+
+eth_balance_condition = {
     "version": ConditionLingo.VERSION,
     "condition": {
-        "chain": 1,
-        "method": "blocktime",
-        "returnValueTest": {"comparator": "<", "value": 0},
+        "chain": 80001,
+        "method": "eth_getBalance",
+        "parameters": ["0x210eeAC07542F815ebB6FD6689637D8cA2689392", "latest"],
+        "returnValueTest": {"comparator": "==", "value": 0},
     },
 }
 
-ciphertext, tdr = enrico.encrypt_for_dkg_and_produce_decryption_request(
-    plaintext=plaintext,
-    conditions=before_the_beginning_of_time,
-    ritual_id=ANYTHING_CAN_BE_PASSED_AS_RITUAL_ID,
-)   
+message = "hello world".encode()
+ciphertext = enrico.encrypt_for_dkg(plaintext=message, conditions=eth_balance_condition)
 
-print(tdr)
+print(f"Encrypted message: {bytes(ciphertext).hex()}")
+   
+tmk = {
+    'ciphertext': base64.b64encode(bytes(ciphertext)).decode(),
+    'conditions': eth_balance_condition
+}
 
-filename = 'example.tdr'
-with open(filename, 'wb') as file:
-    data = bytes(tdr)
+tmk_json = json.dumps(tmk)
+
+filename = 'example.tmk'
+with open(filename, 'w') as file:
+    data = tmk_json
     file.write(data)
     print(f'Wrote {len(data)} bytes to {filename}')
