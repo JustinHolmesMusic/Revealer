@@ -13,3 +13,9 @@ Install dependencies:
 ```
 $ pip install -r requirements.txt
 ```
+
+## Ape tests
+```
+$ ape plugins install solidity
+$ ape test
+```
