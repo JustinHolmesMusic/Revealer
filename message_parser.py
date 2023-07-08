@@ -72,25 +72,30 @@ async def decrypt_attached_tmk(message):
 
         bob.start_learning_loop(now=True)
 
-        #### Nonsense
-        ritual = self.get_ritual_from_id(15)
-        cohort = self.resolve_cohort(ritual=ritual, timeout=20)
-
-
-
-
-        cleartext_from_ciphertext = bob.decrypt_using_existing_decryption_request(
-            tdr,
-            participant_public_keys=ritual.participant_public_keys,
-            cohort=cohort,
-            threshold=1,
+        plaintext_of_symkey = bob.threshold_decrypt(
+            ritual_id=15,  # Cuz 15
+            ciphertext=ciphertext_to_decrypt_with_threshold,
+            conditions=tmk_dict["conditions"],
         )
 
-        print(bytes(cleartext).decode())
+        f = Fernet(bytes(plaintext_of_symkey))
+        bulk_ciphertext = base64.b64decode(tmk_dict['bulk_ciphertext'])
+        hopefully_tony = f.decrypt(bulk_ciphertext)
+
+        filelike = io.BytesIO(hopefully_tony)
+        await message.reply("Here's what I found.", file=discord.File(filelike, filename=tmk_dict['filename']))
 
 
-     
+async def parse_message(message):
+    if "decrypt" in message.content.lower():
+        message_to_look_for_attachments = message.reference.resolved
+        if message_to_look_for_attachments.attachments:
+            await decrypt_attached_tmk(message_to_look_for_attachments)
+        # await message.reply(reply)
+############################
+
+
     for question, reply in command_maping:
 
-     if question in message.content.lower():
-        await message.reply(reply)
+        if question in message.content.lower():
+            await message.reply(reply)
