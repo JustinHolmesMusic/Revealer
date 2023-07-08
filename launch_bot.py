@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands    
 from message_parser import parse_message
 import os
 
@@ -20,9 +20,11 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    print(message.content)
     if message.author.bot:
+
         return
-    if not message.channel.name in ("test-bot", "vegetables"):
+    if not message.channel.name in ("test-bot", "vegetables", "nft", "threshold", "contributed", "website", "art", "reset", "not enough", "verify", "number", "minimum", "usd", "after", "3 ETH",):
         return
     await parse_message(message=message)
 

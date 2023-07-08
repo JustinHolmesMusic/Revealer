@@ -1,3 +1,11 @@
+import requests
+import io
+import discord
+from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
+from nucypher.characters.chaotic import ThisBobAlwaysDecrypts as Bob
+from nucypher.policy.conditions.lingo import ConditionLingo
+from nucypher_core import ThresholdDecryptionRequest
+
 command_maping = [
     ("vegetables", "I like vegetables"),
     ("nft", "Once 10 ETH have been contributed the album will be relased and anyone can listen to the album."),
@@ -19,8 +27,43 @@ command_maping = [
 ]
 
 
+bob = Bob(domain="lynx", eth_provider_uri="Nowhere")
+
 async def parse_message(message):
-  for question, reply in command_maping:
+    if message.attachments:
+        url = message.attachments[0].url
+        filename = message.attachments[0].filename
+        print(url)
+        attachment_response = requests.get(url)
+        attachment_filelike = io.BytesIO(attachment_response.content)
+        attachment_df = discord.File(attachment_filelike, filename=filename)
+        await message.reply("right back at you", file=attachment_df)
+  
+        try:
+            tdr = ThresholdDecryptionRequest.from_bytes(bytes(attachment_response.content))
+        except:
+            await message.reply("wrong file type")
+            return
+        
+        cohort = bob._dkg_insight.fake_ritual.fake_nodes
+
+        cleartext_from_ciphertext = bob.decrypt_using_existing_decryption_request(
+        tdr,
+        participant_public_keys=bob._dkg_insight.fake_ritual.participant_public_keys,
+        cohort=cohort,
+        threshold=1,
+        )   
+
+        decoded_cleartext_from_ciphertext = bytes(cleartext_from_ciphertext)
+        decoded_cleartext_from_tdr = bytes(cleartest_from_tdr)
+
+        assert decoded_cleartext_from_ciphertext == plaintext
+        assert plaintext == decoded_cleartext_from_tdr
+        print(f"Decrypted cleartext: {decoded_cleartext_from_ciphertext}")
+
+
+     
+    for question, reply in command_maping:
 
      if question in message.content.lower():
         await message.reply(reply)
