@@ -45,10 +45,6 @@ plaintext_of_sym_key = keygen()
 secret_hash = keccak(plaintext_of_sym_key)
 bulk_ciphertext = encapsulate(plaintext_of_sym_key)
 
-print(f"secret: {plaintext_of_sym_key.hex()}")
-print(f"secret hash: {secret_hash.hex()}")
-print(f"secret ciphertext: {bulk_ciphertext.hex()}")
-
 ###############
 # Enrico
 ###############
@@ -84,8 +80,6 @@ eth_balance_condition = {
 message = "hello world".encode()
 ciphertext = enrico.encrypt_for_dkg(plaintext=message, conditions=eth_balance_condition)
 
-print(f"Encrypted message: {bytes(ciphertext).hex()}")
-   
 tmk = {
     'ciphertext': base64.b64encode(bytes(ciphertext)).decode(),
     'conditions': eth_balance_condition
