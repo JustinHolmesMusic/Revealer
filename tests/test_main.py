@@ -8,3 +8,7 @@ def test_properties(chain, contribution,  owner, receiver, threshold, countdownP
     assert contribution.countdownPeriod() == countdownPeriod
     assert contribution.threshold() == threshold
     assert contribution.deadline() > chain.pending_timestamp
+
+
+def test_dummy2(encrypt):
+    print(encrypt)
