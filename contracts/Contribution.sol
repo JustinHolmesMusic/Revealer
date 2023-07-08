@@ -14,6 +14,7 @@ contract Contribution {
     bytes public keyCiphertext;
     bytes public keyPlaintext;
 
+    mapping(address => uint256) public amountContributedByAddress;
 
     event Contribute(address indexed contributor, uint256 amount);
     event Decryptable(address indexed lastContributor);
@@ -59,20 +60,16 @@ contract Contribution {
     }
 
     function contribute() external payable {
-        // This is "contribution-revealer logic"
-        require(
-            block.timestamp < deadline,
-            "Cannot contribute after the deadline"
-        );
+        require(block.timestamp < deadline, "Cannot contribute after the deadline");
         require(isKeySet, "Key has not been set.");
 
+        amountContributedByAddress[msg.sender] += msg.value; // Add contribution to the mapping
+
         if (address(this).balance >= threshold) {
-            // Mark the material as released
             materialReleaseConditionMet = true;
             emit Decryptable(msg.sender);
         }
 
-        // Reset the countdown period
         deadline = block.timestamp + countdownPeriod;
 
         emit Contribute(msg.sender, msg.value);

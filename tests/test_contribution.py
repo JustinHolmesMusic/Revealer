@@ -77,6 +77,23 @@ def test_album_release(contribution: ape.Contract, owner: ape.Account, not_owner
 
 
 @pytest.mark.usefixtures("commit_secret")
+def test_contribute_mapping(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, receiver: ape.Account):
+    contribution.contribute(sender=not_owner, value=1000)
+    assert contribution.balance == 1000
+    assert contribution.amountContributedByAddress(not_owner) == 1000
+
+    contribution.contribute(sender=not_owner, value=2000)
+    assert contribution.balance == 3000
+    assert contribution.amountContributedByAddress(not_owner) == 3000
+
+    contribution.contribute(sender=owner, value=4000)
+    assert contribution.balance == 7000
+    assert contribution.amountContributedByAddress(owner) == 4000
+
+    assert contribution.amountContributedByAddress(receiver) == 0
+
+
+@pytest.mark.usefixtures("commit_secret")
 def test_cannot_withdraw_funds_before_deadline(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, receiver: ape.Account, threshold: int):
     contribution.contribute(sender=not_owner, value=threshold // 2)
     with ape.reverts("Cannot withdraw funds before deadline"):

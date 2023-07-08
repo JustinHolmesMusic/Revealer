@@ -46,7 +46,6 @@ def ritual_id():
 def contract_address(contribution):
     return contribution.address
 
-
 @pytest.fixture
 def dummy_key_base64():
     return b'6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM='
