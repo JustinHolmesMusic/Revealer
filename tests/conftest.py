@@ -35,9 +35,6 @@ def coordinator_network():
 def ritual_id():
     return 0
 
-DKG_SIZE = 4
-
-
 @pytest.fixture(scope='session', autouse=True)
 def contribution(project, owner, countdownPeriod, threshold, receiver):
     vowelsounds_contracts_dependency_api = project.dependencies["contribution-contracts"]
