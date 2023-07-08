@@ -1,4 +1,4 @@
-name: vowel-sounds-album-drop
+name: revealer
 plugins:
   - name: solidity
 
@@ -9,8 +9,3 @@ solidity:
 test:
   mnemonic: test test test test test test test test test test test junk
   number_of_accounts: 5
-
-dependencies:
-  - name: contribution-contracts
-    github: jMyles/VowelSoundsAlbumDrop
-    ref: main
