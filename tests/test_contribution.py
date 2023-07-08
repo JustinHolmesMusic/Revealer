@@ -105,7 +105,7 @@ def test_cannot_withdraw_funds_before_deadline(contribution: ape.Contract, owner
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_withdraw_funds_after_deadline(chain: ape.chain, contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, receiver: ape.Account, threshold: int, countdownPeriod: int):
+def test_withdraw_funds_after_deadline_threshold_not_met(chain: ape.chain, contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, receiver: ape.Account, threshold: int, countdownPeriod: int):
     receiver_balance_before = receiver.balance
 
     contribution_amount = threshold // 4
@@ -135,4 +135,26 @@ def test_withdraw_funds_after_deadline(chain: ape.chain, contribution: ape.Contr
 
     assert contribution.balance == 0
 
+
+@pytest.mark.usefixtures("commit_secret")
+def test_withdraw_funds_after_deadline_fulfilled_threshold(chain: ape.chain, contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, receiver: ape.Account, threshold: int, countdownPeriod: int):
+    receiver_balance_before = receiver.balance
+
+    contribution_amount = int(threshold * 2 / 3)
+    contribution.contribute(sender=not_owner, value=contribution_amount)
+    contribution.contribute(sender=owner, value=contribution_amount)
+
+    chain.provider.set_timestamp(chain.pending_timestamp + countdownPeriod + 1)
+
+    # Reached threshold
+    assert contribution.materialReleaseConditionMet() == True 
+    assert contribution.balance == contribution_amount * 2
+    
+    contribution.withdraw(sender=receiver)
+
+    # this doesn't work because of the gas cost
+    # assert receiver.balance == receiver_balance_before + contribution_amount * 2
+
+    assert receiver.balance >= receiver_balance_before + contribution_amount * 2 - threshold // 10
+    assert contribution.balance == 0
 
