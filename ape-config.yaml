@@ -1,0 +1,16 @@
+name: vowel-sounds-album-drop
+plugins:
+  - name: solidity
+
+solidity:
+  version: 0.8.20
+  evm_version: paris
+
+test:
+  mnemonic: test test test test test test test test test test test junk
+  number_of_accounts: 5
+
+dependencies:
+  - name: contribution-contracts
+    github: jMyles/VowelSoundsAlbumDrop
+    ref: main
