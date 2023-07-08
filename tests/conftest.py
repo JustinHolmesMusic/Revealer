@@ -47,6 +47,19 @@ def contract_address(contribution):
     return contribution.address
 
 @pytest.fixture
+def dummy_key_base64():
+    return b'6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM='
+
+@pytest.fixture
+def dummy_key_ciphertext_base64():
+    return b'gAAAAABkqYAnoyOibrOGDpql3D58PQn_UXw9o-xCPtEF1sxEHMc8TknAcJMqO2MCzWDsVD5TJ9AhYGZmnfVLYGavp7ch_BdZmR9sAIsYUUUNDRQGK-7tlXI='
+
+@pytest.fixture
+def dummy_key_hash():
+    return b'HKu\xef\xd8\xcb\x81\x0fW\x13\xc1\xd3B\x0c\x0c\xe1\xa3"w\x16I\xe1\x1a\x92l\xc4\xe4^\xffz\x80\x00'
+
+
+@pytest.fixture
 def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
     print(_CONDITION_CHAINS)
 
