@@ -1,11 +1,11 @@
-import os
 import base64
 import json
+
 from nucypher_core.ferveo import DkgPublicKey
 
 from nucypher.blockchain.eth.agents import CoordinatorAgent
 from nucypher.blockchain.eth.registry import InMemoryContractRegistry
-from nucypher.characters.lawful import Bob, Enrico
+from nucypher.characters.lawful import Enrico
 from nucypher.policy.conditions.lingo import ConditionLingo
 from nucypher.utilities.logging import GlobalLoggerSettings
 
@@ -22,6 +22,32 @@ network = "lynx"
 
 coordinator_provider_uri = 
 coordinator_network = "mumbai"
+
+#####################
+# Scully the Symmet
+#####################
+from cryptography.fernet import Fernet
+from eth_utils import keccak
+
+def keygen():
+    _secret = Fernet.generate_key()
+    return _secret
+
+with open('manzana.mp3', 'rb') as tony:
+    definitely_tony = tony.read()
+
+def encapsulate(secret):
+    f = Fernet(secret)
+    capsule = f.encrypt(definitely_tony)
+    return capsule
+
+plaintext_of_sym_key = keygen()
+secret_hash = keccak(plaintext_of_sym_key)
+bulk_ciphertext = encapsulate(plaintext_of_sym_key)
+
+print(f"secret: {plaintext_of_sym_key.hex()}")
+print(f"secret hash: {secret_hash.hex()}")
+print(f"secret ciphertext: {bulk_ciphertext.hex()}")
 
 ###############
 # Enrico
