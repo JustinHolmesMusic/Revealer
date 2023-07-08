@@ -10,7 +10,7 @@ contract Contribution {
     uint256 public threshold;
     bool public isKeySet = false;
 
-    bytes32 public keyHash;
+    bytes32 public keyPlaintextHash;
     bytes public keyCiphertext;
     bytes public keyPlaintext;
 
@@ -48,14 +48,14 @@ contract Contribution {
     function commitSecret(bytes32 _hash, bytes memory _ciphertext) external onlyOwner {
         require(!isKeySet, "Key already set.");
 
-        keyHash = _hash;
+        keyPlaintextHash = _hash;
         keyCiphertext = _ciphertext;
         isKeySet = true;
     }
 
     function revealSecret(bytes memory secret) external {
         require(materialReleaseConditionMet, "Material has not been set for a release.");
-        require(keccak256(secret) == keyHash, "Invalid secret provided, hash does not match.");
+        require(keccak256(secret) == keyPlaintextHash, "Invalid secret provided, hash does not match.");
         keyPlaintext = secret;
     }
 
