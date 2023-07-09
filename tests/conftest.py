@@ -18,6 +18,12 @@ def receiver(accounts):
 def not_owner(accounts):
     return accounts[2]
 
+
+@pytest.fixture
+def amb(accounts):
+    return accounts[3]
+
+
 @pytest.fixture
 def countdownPeriod():
     return 600
@@ -27,8 +33,15 @@ def threshold():
     return 1000000000000000000
 
 @pytest.fixture
-def contribution(project, receiver, owner, countdownPeriod, threshold):
-    return owner.deploy(project.Contribution, countdownPeriod, threshold, receiver)
+def contribution(project, receiver, owner, countdownPeriod, threshold, amb):
+    return owner.deploy(
+        project.Contribution,
+        countdownPeriod,
+        threshold,
+        receiver,
+        True,
+        amb
+    )
 
 @pytest.fixture
 def coordinator_provider_uri():
