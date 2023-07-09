@@ -9,8 +9,6 @@ solidity:
     - "@openzeppelin/contracts=openzeppelin/v4.9.1"
     - "@openzeppelin-upgradeable/contracts=openzeppelin-upgradeable/v4.9.1"
 
-
-
 test:
   mnemonic: test test test test test test test test test test test junk
   number_of_accounts: 5
