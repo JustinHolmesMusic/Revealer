@@ -9,15 +9,8 @@ for prompt, reply in simple_reply_defaults:
 
 
 async def parse_message(message):
-    if "decrypt" in message.content.lower():
-        message_to_look_for_attachments = message.reference.resolved
-        if message_to_look_for_attachments.attachments:
-            await decrypt_attached_tmk(message_to_look_for_attachments)
-        # await message.reply(reply)
-############################
+    for candidate_response in available_responses:
+        for trigger in candidate_response.triggers:
+            if trigger in message.content.lower():
+                await candidate_response.respond_to(message)
 
-
-    for question, reply in command_maping:
-
-        if question in message.content.lower():
-            await message.reply(reply)
