@@ -16,7 +16,6 @@ bob = Bob(domain="lynx", eth_provider_uri="Nowhere")
 
 async def decrypt_attached_tmk(message):
 
-
     if message.attachments:
         url = message.attachments[0].url
         tmk_filename = message.attachments[0].filename
