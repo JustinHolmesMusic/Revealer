@@ -6,7 +6,7 @@ import os
 import dotenv
 dotenv.load_dotenv()
 
-bot_token = os.environ['BOT_TOKEN']
+bot_token = os.environ["DISCORD_BOT_TOKEN"]
 
 intents = discord.Intents.default()
 intents.message_content = True
