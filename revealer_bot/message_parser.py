@@ -1,4 +1,4 @@
-from decryption.action import decrypt.attached.tmk
+from revealer_bot.decryption_action import decrypt_attached_tmk
 
 command_maping = [
     ("vegetables", "I like vegetables"),
