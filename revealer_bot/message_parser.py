@@ -1,6 +1,11 @@
+from bot_responses import SimpleReply
 from revealer_bot.decryption_action import decrypt_attached_tmk
+from built_in_messages import simple_reply_defaults
 
 
+available_responses = list()
+for prompt, reply in simple_reply_defaults:
+    available_responses.append(SimpleReply(triggers=(prompt,), initial_reply=reply))
 
 
 async def parse_message(message):
