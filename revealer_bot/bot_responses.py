@@ -16,7 +16,7 @@ class BotResponse:
     In response to a message, reply to a message or take some action.
     """
 
-    def __init__(self, triggers, initial_reply):
+    def __init__(self, triggers: Iterable, initial_reply: str, must_mention: bool = False):
         self.triggers = triggers
         self.initial_reply = initial_reply
 
