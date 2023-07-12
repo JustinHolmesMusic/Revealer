@@ -35,21 +35,6 @@ async def decrypt_attached_tmk(message):
 
         ######### BAAAAAAHB ########
 
-        staking_provider_uri = "https://goerli.infura.io/v3/a11313ddcf61443898b6a47e952d255c"
-        network = "lynx"
-        coordinator_provider_uri = "https://polygon-mumbai.infura.io/v3/a11313ddcf61443898b6a47e952d255c"
-        coordinator_network = "mumbai"
-
-        bob = Bob(
-            eth_provider_uri=staking_provider_uri,
-            domain=network,
-            coordinator_provider_uri=coordinator_provider_uri,
-            coordinator_network=coordinator_network,
-            registry=InMemoryContractRegistry.from_latest_publication(network=network),
-        )
-
-        bob.start_learning_loop(now=True)
-
         plaintext_of_symkey = bob.threshold_decrypt(
             ritual_id=15,  # Cuz 15
             ciphertext=ciphertext_to_decrypt_with_threshold,

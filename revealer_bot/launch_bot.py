@@ -1,37 +1,33 @@
-import discord 
-from discord.ext import commands    
-from message_parser import parse_message
 import os
 
-import dotenv
-dotenv.load_dotenv()
+from bot_lair import the_actual_revealer_bot
+from message_parser import parse_message
+from revealer_bot.bob_and_other_networky_things import bob
 
 bot_token = os.environ["DISCORD_BOT_TOKEN"]
 
-intents = discord.Intents.default()
-intents.message_content = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
-
-@bot.event
+@the_actual_revealer_bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name} ({bot.user.id})')
+    print(f'Logged in as {the_actual_revealer_bot.user.name} ({the_actual_revealer_bot.user.id})')
     print('------')
 
-@bot.event
+
+@the_actual_revealer_bot.event
 async def on_message(message):
     print(message.content)
-    if message.author.bot:
 
+    if message.author.bot:
         return
-    if not message.channel.name in ("test-bot", "vegetables", "nft", "threshold", "contributed", "website", "art", "reset", "not enough", "verify", "number", "minimum", "usd", "after", "3 ETH",):
+
+    if not message.channel.name in (
+            "test-bot", "vegetables", "nft", "threshold", "contributed", "website", "art", "reset", "not enough",
+            "verify",
+            "number", "minimum", "usd", "after", "3 ETH",):
         return
+
     await parse_message(message=message)
 
- #   await message.channel.send("Hello World")
 
-  #  for channel in bot.get_all_channels():
-  #      if isinstance(channel, discord.TextChannel):
-  #          await channel.send(f'Message received: {message.content}')
-
-bot.run(bot_token)
+the_actual_revealer_bot.run(bot_token)
+bob.start_learning_loop()
