@@ -19,6 +19,18 @@ class BotResponse:
     def __init__(self, triggers: Iterable, initial_reply: str, must_mention: bool = False):
         self.triggers = triggers
         self.initial_reply = initial_reply
+        self.must_mention = must_mention
+
+    async def _construct_and_send_response(self, message):
+        raise NotImplementedError
+
+    async def respond_to(self, message):
+        if self.must_mention:
+            if not bot_is_mentioned_in(message):
+                return
+
+        await self._construct_and_send_response(message)
+
 
 
 class SimpleReply(BotResponse):
@@ -26,7 +38,7 @@ class SimpleReply(BotResponse):
     Reply to a message with a message.
     """
 
-    async def respond_to(self, message):
+    async def _construct_and_send_response(self, message):
         await message.reply(self.initial_reply)
 
 
