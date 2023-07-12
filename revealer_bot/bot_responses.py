@@ -46,3 +46,11 @@ class BotActionResponse(BotResponse):
     """
     A bot takes some action in response to a message.
     """
+
+    def __init__(self, action: Callable, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.action = action
+
+    async def _construct_and_send_response(self, message):
+        await message.reply(self.initial_reply)
+        await self.action(message)
