@@ -35,9 +35,9 @@ async def decrypt_attached_tmk(message):
 
         ######### BAAAAAAHB ########
 
-        staking_provider_uri = os.environ["STAKING_PROVIDER_URI"]
+        staking_provider_uri = "https://goerli.infura.io/v3/a11313ddcf61443898b6a47e952d255c"
         network = "lynx"
-        coordinator_provider_uri = os.environ["COORDINATOR_PROVIDER_URI"]
+        coordinator_provider_uri = "https://polygon-mumbai.infura.io/v3/a11313ddcf61443898b6a47e952d255c"
         coordinator_network = "mumbai"
 
         bob = Bob(
