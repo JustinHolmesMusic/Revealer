@@ -1,6 +1,9 @@
-from typing import Iterable, Callable
+import asyncio
+import json
+from typing import Iterable
 
-from revealer_bot.bot_lair import the_actual_revealer_bot
+import requests
+
 
 def bot_is_mentioned_in(message):
     for mention in message.mentions:
@@ -8,7 +11,6 @@ def bot_is_mentioned_in(message):
             return True
     else:
         return False
-
 
 
 class BotResponse:
@@ -24,6 +26,9 @@ class BotResponse:
     async def _construct_and_send_response(self, message):
         raise NotImplementedError
 
+    async def send_initial_reply_to(self, message):
+        await message.reply(self.initial_reply)
+
     async def respond_to(self, message):
         if self.must_mention:
             if not bot_is_mentioned_in(message):
@@ -32,25 +37,29 @@ class BotResponse:
         await self._construct_and_send_response(message)
 
 
-
 class SimpleReply(BotResponse):
     """
     Reply to a message with a message.
     """
+    thread = None
 
     async def _construct_and_send_response(self, message):
-        await message.reply(self.initial_reply)
+        self.initial_reply_task = self.send_initial_reply_to(message)
 
 
 class BotActionResponse(BotResponse):
     """
     A bot takes some action in response to a message.
     """
+    thread = None
 
-    def __init__(self, action: Callable, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.action = action
+    async def send_initial_reply_to(self, message):
+        thread_name = f"Network Status requested by {message.author.display_name} at {message.created_at.isoformat()[0:16]}"
+        self.thread = await message.create_thread(name=thread_name, auto_archive_duration=60)
+        await self.thread.send(self.initial_reply)
 
     async def _construct_and_send_response(self, message):
-        await message.reply(self.initial_reply)
-        await self.action(message)
+        response_tasks = set()
+        response_tasks.add(asyncio.create_task(self.send_initial_reply_to(message)))
+        response_tasks.add(asyncio.create_task(self.action()))
+        return response_tasks

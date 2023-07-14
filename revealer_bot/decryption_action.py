@@ -6,12 +6,10 @@ import os
 from cryptography.fernet import Fernet
 import discord
 import requests
-from nucypher.blockchain.eth.registry import InMemoryContractRegistry
+
 from nucypher_core import ferveo
 
-from nucypher.characters.lawful import Bob
-
-bob = Bob(domain="lynx", eth_provider_uri="Nowhere")
+from revealer_bot.bob_and_other_networky_things import bob
 
 
 async def decrypt_attached_tmk(message):

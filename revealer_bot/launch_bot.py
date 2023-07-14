@@ -10,24 +10,15 @@ bot_token = os.environ["DISCORD_BOT_TOKEN"]
 @the_actual_revealer_bot.event
 async def on_ready():
     print(f'Logged in as {the_actual_revealer_bot.user.name} ({the_actual_revealer_bot.user.id})')
-    print('------')
+    print('------synced------')
 
 
-@the_actual_revealer_bot.event
-async def on_message(message):
-    print(message.content)
-
-    if message.author.bot:
-        return
-
-    if not message.channel.name in (
-            "test-bot", "vegetables", "nft", "threshold", "contributed", "website", "art", "reset", "not enough",
-            "verify",
-            "number", "minimum", "usd", "after", "3 ETH",):
-        return
-
-    await parse_message(message=message)
-
+from revealer_commands import *
 
 the_actual_revealer_bot.run(bot_token)
 bob.start_learning_loop()
+
+
+
+
+
