@@ -58,12 +58,12 @@ def test_not_being_able_to_contribute_after_deadline(chain: ape.chain, contribut
     #  function contribute() external payable {
     contribution.contribute(sender=not_owner, value=Web3.to_wei(1, "ether"))
 
+    with ape.reverts("Contribution must be equal to or greater than the minimum."):
+        contribution.contribute(sender=not_owner, value=1)
+
     # contribution after deadline should fail
     chain.provider.set_timestamp(chain.pending_timestamp + countdownPeriod + 1)
 
-    with ape.reverts("Contribution must be equal to or greater than the minimum."):
-        contribution.contribute(sender=not_owner, value=1)
-        
     with ape.reverts("Cannot contribute after the deadline"):
         contribution.contribute(sender=not_owner, value=Web3.to_wei(1, "ether"))
 

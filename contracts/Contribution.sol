@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 contract Contribution {
     
     // roles
-    address payable public immutable owner;
+    address public immutable owner;
     address payable public immutable beneficiary;
 
     // countdown and threshold
@@ -32,6 +32,7 @@ contract Contribution {
     event Contribute(address indexed contributor, uint256 amount);
     event Decryptable(address indexed lastContributor);
     event Withdraw(address indexed beneficiary, uint256 amount);
+    event ClockReset(uint256 deadline);
 
     constructor(
         uint256 _countdownPeriod,
@@ -42,15 +43,16 @@ contract Contribution {
     ) {
         countdownPeriod = _countdownPeriod;
         deadline = 0;
-        owner = payable(msg.sender);
+        owner = msg.sender;
+        beneficiary = payable(_beneficiary);
         threshold = _threshold;
         minContribution = _minContribution;
-        beneficiary = _beneficiary;
         testnet = _testnet;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Only the contract owner can call this function.");
+        require(msg.sender == owner,
+            "Only the contract owner can call this function.");
         _;
     }
 
@@ -105,11 +107,11 @@ contract Contribution {
     }
 
     function _contribute(bool combine) internal {
-        require(msg.value >= minContribution,
-            "Contribution must be equal to or greater than the minimum.");
+        require(isKeySet, "Key has not been set.");
         require(!materialReleaseConditionMet || block.timestamp < deadline,
             "Cannot contribute after the deadline");
-        require(isKeySet, "Key has not been set.");
+        require(msg.value >= minContribution,
+            "Contribution must be equal to or greater than the minimum.");
 
         if (contributionsByAddress[msg.sender].length == 0) { // If this is the first contribution from this address
             contributors.push(msg.sender); // Add the address to the contributors array
@@ -128,6 +130,7 @@ contract Contribution {
 
         if (materialReleaseConditionMet) {
             deadline = block.timestamp + countdownPeriod;
+            emit ClockReset(deadline);
         }
 
         emit Contribute(msg.sender, msg.value);
@@ -164,8 +167,9 @@ contract Contribution {
     function withdraw() external onlyBeneficiary {
         require(materialReleaseConditionMet, "Material has not been set for a release.");
         require(deadline < block.timestamp, "Cannot withdraw funds before deadline");
-        beneficiary.transfer(address(this).balance);
-        emit Withdraw(beneficiary, address(this).balance);
+        uint256 balance = address(this).balance;
+        beneficiary.transfer(balance);
+        emit Withdraw(beneficiary, balance);
     }
 
 }
