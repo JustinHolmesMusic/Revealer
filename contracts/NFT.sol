@@ -7,17 +7,28 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VowelSoundsNFT is ERC721URIStorage, Ownable {
     uint256 private _tokenIdCounter;
-    mapping(address => bool) public members;
+    mapping(address => uint256) public contributors;
     mapping(address => bool) private _hasMinted;
+    address public amb;
 
-    constructor() ERC721("VowelSoundsNFT", "AEIOU") {}
+    constructor(address _amb) ERC721("VowelSoundsNFT", "AEIOU") {
+        amb = _amb;
+    }
 
-    function addMember(address member) public onlyOwner {
-        members[member] = true;
+
+    function setAmb(address _amb) external onlyOwner {
+        amb = _amb;
+    }
+
+    function receiveContribution(address contributor, uint256 amount) public {
+        require(msg.sender == amb, "Only the AMB can call this function");
+        require(amount > 0, "Amount must be greater than 0");
+        require(contributors[contributor] > 0, "Address has already been synced");
+        contributors[contributor] = amount;
     }
 
     function mintNFT() public {
-        require(members[msg.sender], "Only members can mint NFTs");
+        require(contributors[msg.sender] > 0, "Only members can mint NFTs");
         require(!_hasMinted[msg.sender], "Address has already minted an NFT");
         _safeMint(msg.sender, _tokenIdCounter);
         _setTokenURI(_tokenIdCounter, string(abi.encodePacked("https://vowelsoundsnft.com/metadata/", Strings.toString(_tokenIdCounter))));
