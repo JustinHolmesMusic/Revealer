@@ -4,15 +4,18 @@ from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
 from nucypher.characters.chaotic import ThisBobAlwaysDecrypts as _Bob
 from nucypher.policy.conditions.lingo import ConditionLingo
 from nucypher.policy.conditions.evm import _CONDITION_CHAINS
+from web3 import Web3
 
 
 @pytest.fixture
 def owner(accounts):
     return accounts[0]
 
+
 @pytest.fixture
 def receiver(accounts):
     return accounts[1]
+
 
 @pytest.fixture
 def not_owner(accounts):
@@ -28,9 +31,11 @@ def amb(accounts):
 def countdownPeriod():
     return 600
 
+
 @pytest.fixture
 def threshold():
-    return 1000000000000000000
+    return Web3.to_wei(1, "ether")
+
 
 @pytest.fixture
 def contribution(project, receiver, owner, countdownPeriod, threshold, amb):
@@ -38,34 +43,41 @@ def contribution(project, receiver, owner, countdownPeriod, threshold, amb):
         project.Contribution,
         countdownPeriod,
         threshold,
+        Web3.to_wei(0.1, "ether"),
         receiver,
-        True,
-        amb
+        False,
     )
+
 
 @pytest.fixture
 def coordinator_provider_uri():
     return "tester://pyevm"
 
+
 @pytest.fixture
 def coordinator_network():
     return "lynx"
-    
+
+
 @pytest.fixture
 def ritual_id():
     return 0
+
 
 @pytest.fixture
 def contract_address(contribution):
     return contribution.address
 
+
 @pytest.fixture
 def dummy_key_base64():
     return b'6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM='
 
+
 @pytest.fixture
 def dummy_key_ciphertext_base64():
     return b'gAAAAABkqYAnoyOibrOGDpql3D58PQn_UXw9o-xCPtEF1sxEHMc8TknAcJMqO2MCzWDsVD5TJ9AhYGZmnfVLYGavp7ch_BdZmR9sAIsYUUUNDRQGK-7tlXI='
+
 
 @pytest.fixture
 def dummy_key_hash():
