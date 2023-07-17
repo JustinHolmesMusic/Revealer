@@ -1,3 +1,4 @@
 discord.py
 python-dotenv
 eth-ape
+git+ssh://git@github.com/nucypher/nucypher.git@development
