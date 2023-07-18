@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
 from nucypher.characters.chaotic import ThisBobAlwaysDecrypts as _Bob

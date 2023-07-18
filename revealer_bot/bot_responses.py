@@ -1,8 +1,5 @@
 import asyncio
-import json
 from typing import Iterable
-
-import requests
 
 
 def bot_is_mentioned_in(message):

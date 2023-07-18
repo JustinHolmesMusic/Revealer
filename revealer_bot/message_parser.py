@@ -1,10 +1,5 @@
-import asyncio
-import json
-
-import requests
 from bot_responses import SimpleReply
 from built_in_messages import simple_reply_defaults
-from icmplib import async_ping
 
 from revealer_bot.bot_responses import BotActionResponse
 
