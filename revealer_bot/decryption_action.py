@@ -23,7 +23,7 @@ async def decrypt_attached_tmk(message):
         try:
             json_str_repr_of_tmk = str(attachment_response.content, encoding="utf-8")
             tmk_dict = json.loads(json_str_repr_of_tmk)
-        except:
+        except json.JSONDecodeError:
             await message.reply("wrong file type or something")
             return
         print("--------- Threshold Decryption ---------")
