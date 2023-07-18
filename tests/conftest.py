@@ -1,6 +1,5 @@
 import pytest
 from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
-from nucypher.characters.chaotic import ThisBobAlwaysDecrypts as _Bob
 from nucypher.policy.conditions.evm import _CONDITION_CHAINS
 from nucypher.policy.conditions.lingo import ConditionLingo
 from web3 import Web3
@@ -91,7 +90,7 @@ def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
     THIS_IS_NOT_A_TRINKET = 2  # sometimes called "public key"
 
     enrico = _Enrico(encrypting_key=THIS_IS_NOT_A_TRINKET)
-    bob = _Bob(domain=coordinator_network, eth_provider_uri=coordinator_provider_uri)
+    # bob = _Bob(domain=coordinator_network, eth_provider_uri=coordinator_provider_uri)
 
     ANYTHING_CAN_BE_PASSED_AS_RITUAL_ID = 55
 

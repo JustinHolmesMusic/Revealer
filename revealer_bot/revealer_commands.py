@@ -11,7 +11,7 @@ from revealer_bot.network_status import get_lynx_network_status
 async def network_status(interaction: discord.Interaction, network: str):
     """Checks status of Threshold lynx testnet"""
     if not network == "lynx":
-        await interaction.response.send_message(f"Currently, only the lynx network is supported")
+        await interaction.response.send_message("Currently, only the lynx network is supported")
 
     await get_lynx_network_status(interaction)
 

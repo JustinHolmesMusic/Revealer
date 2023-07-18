@@ -1,5 +1,7 @@
 import os
+
 from bot_lair import the_actual_revealer_bot
+
 from revealer_bot.bob_and_other_networky_things import bob
 
 bot_token = os.environ["DISCORD_BOT_TOKEN"]
