@@ -9,7 +9,7 @@ def main(account_id=None):
 
     coordinator = project.Contribution.deploy(
         3600,
-        Web3.to_wei(10, 'ether'),
+        Web3.to_wei(10, "ether"),
         deployer,
         True,  # testnet mode
         sender=deployer,

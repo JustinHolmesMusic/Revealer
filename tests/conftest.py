@@ -1,9 +1,10 @@
-import pytest
 import json
+
+import pytest
 from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
 from nucypher.characters.chaotic import ThisBobAlwaysDecrypts as _Bob
-from nucypher.policy.conditions.lingo import ConditionLingo
 from nucypher.policy.conditions.evm import _CONDITION_CHAINS
+from nucypher.policy.conditions.lingo import ConditionLingo
 from web3 import Web3
 
 
@@ -71,12 +72,12 @@ def contract_address(contribution):
 
 @pytest.fixture
 def dummy_key_base64():
-    return b'6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM='
+    return b"6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM="
 
 
 @pytest.fixture
 def dummy_key_ciphertext_base64():
-    return b'gAAAAABkqYAnoyOibrOGDpql3D58PQn_UXw9o-xCPtEF1sxEHMc8TknAcJMqO2MCzWDsVD5TJ9AhYGZmnfVLYGavp7ch_BdZmR9sAIsYUUUNDRQGK-7tlXI='
+    return b"gAAAAABkqYAnoyOibrOGDpql3D58PQn_UXw9o-xCPtEF1sxEHMc8TknAcJMqO2MCzWDsVD5TJ9AhYGZmnfVLYGavp7ch_BdZmR9sAIsYUUUNDRQGK-7tlXI="
 
 
 @pytest.fixture
@@ -103,7 +104,13 @@ def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
             "method": "isReleased",
             "contractAddress": contract_address,
             "returnValueTest": {"comparator": "==", "value": True},
-            "functionAbi": {"inputs":[],"name":"isReleased","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+            "functionAbi": {
+                "inputs": [],
+                "name": "isReleased",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function",
+            },
         },
     }
 

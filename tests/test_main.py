@@ -1,8 +1,8 @@
-
 def test_dummy(contribution):
     print(contribution)
 
-def test_properties(chain, contribution,  owner, receiver, threshold, countdownPeriod):
+
+def test_properties(chain, contribution, owner, receiver, threshold, countdownPeriod):
     assert owner == contribution.owner()
     assert receiver == contribution.beneficiary()
     assert contribution.countdownPeriod() == countdownPeriod
