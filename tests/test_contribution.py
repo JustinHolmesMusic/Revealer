@@ -10,7 +10,7 @@ def test_properties(chain, contribution: ape.Contract, owner: ape.Account, recei
     assert receiver == contribution.beneficiary()
     assert contribution.countdownPeriod() == countdownPeriod
     assert contribution.threshold() == threshold
-    assert contribution.deadline() == 0
+    assert contribution.deadline() > chain.pending_timestamp
     assert contribution.isKeySet() is False
 
 

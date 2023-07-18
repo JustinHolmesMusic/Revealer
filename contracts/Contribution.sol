@@ -42,7 +42,7 @@ contract Contribution {
         bool _testnet
     ) {
         countdownPeriod = _countdownPeriod;
-        deadline = 0;
+        deadline = block.timestamp + _countdownPeriod;
         owner = msg.sender;
         beneficiary = payable(_beneficiary);
         threshold = _threshold;
