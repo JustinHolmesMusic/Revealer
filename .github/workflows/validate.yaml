@@ -1,0 +1,26 @@
+# Code validation using pre-commit hooks defined in .pre-commit-config.yaml
+#
+name: Validate
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Run pre-commit checks
+        uses: pre-commit/action@v3.0.0
