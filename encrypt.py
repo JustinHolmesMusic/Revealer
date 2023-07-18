@@ -1,6 +1,8 @@
 import base64
 import json
 
+from cryptography.fernet import Fernet
+from eth_utils import keccak
 from nucypher.blockchain.eth.agents import CoordinatorAgent
 from nucypher.blockchain.eth.registry import InMemoryContractRegistry
 from nucypher.characters.lawful import Enrico
@@ -25,8 +27,6 @@ coordinator_network = "mumbai"
 #####################
 # Scully the Symmet
 #####################
-from cryptography.fernet import Fernet
-from eth_utils import keccak
 
 
 def keygen():
