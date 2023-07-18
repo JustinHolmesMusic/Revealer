@@ -30,7 +30,7 @@ async def get_lynx_network_status(interaction):
         print(f"Hitting node status endpoint: {node['rest_url']}")
         try:
             response = requests.get(f"https://{node['rest_url']}/status", verify=False)
-        except IOError as e:
+        except IOError:
             down_nodes.append(node)
             return
 
