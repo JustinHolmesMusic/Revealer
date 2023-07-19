@@ -1,6 +1,7 @@
 import os
 
 from bot_lair import the_actual_revealer_bot
+from revealer_commands import *  # noqa
 
 from revealer_bot.bob_and_other_networky_things import bob
 
