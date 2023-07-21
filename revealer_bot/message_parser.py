@@ -2,10 +2,9 @@ import asyncio
 import json
 
 import requests
-from icmplib import async_ping
 
-from bot_responses import SimpleReply
-from built_in_messages import simple_reply_defaults
+from revealer_bot.bot_responses import SimpleReply
+from revealer_bot.built_in_messages import simple_reply_defaults
 from revealer_bot.bot_responses import BotActionResponse
 
 available_responses = list()
