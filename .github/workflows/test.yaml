@@ -30,7 +30,7 @@ jobs:
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       # install dependencies if cache does not exist
-      - name: Install QI-lib using Poetry
+      - name: Install dependencies using Poetry
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           poetry install
