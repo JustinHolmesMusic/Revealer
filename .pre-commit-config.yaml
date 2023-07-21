@@ -6,8 +6,6 @@ repos:
         exclude: ^.*\.md$
       - id: end-of-file-fixer
         exclude: \.ipynb$
-      - id: no-commit-to-branch
-        args: [--branch, main]
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: detect-private-key
