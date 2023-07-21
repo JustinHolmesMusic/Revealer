@@ -37,5 +37,5 @@ jobs:
 
       - name: Run tests
         run: | 
-          ape compile --size
-          ape test -s
+          poetry run ape compile --size
+          poetry run ape test -s
