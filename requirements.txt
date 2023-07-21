@@ -1,4 +1,4 @@
 discord.py
 python-dotenv
 eth-ape
-pre-commit
+git+https://github.com/nucypher/nucypher.git@development#egg=nucypher[dev]
