@@ -17,3 +17,6 @@ def main():
     bot_token = os.environ["DISCORD_BOT_TOKEN"]
     the_actual_revealer_bot.run(bot_token)
     bob.start_learning_loop()
+
+if __name__ == '__main__':
+    main()
