@@ -11,6 +11,7 @@ from nucypher.characters.lawful import Enrico
 from nucypher.policy.conditions.lingo import ConditionLingo, Lingo
 from nucypher.utilities.logging import GlobalLoggerSettings
 from nucypher_core.ferveo import DkgPublicKey
+from revealer_bot.types import TMK
 
 ######################
 # Boring setup stuff #
@@ -79,7 +80,7 @@ def main(args):
         plaintext=plaintext_of_sym_key, conditions=eth_balance_condition
     )
 
-    tmk = {
+    tmk: TMK = {
         "bulk_ciphertext": base64.b64encode(bytes(bulk_ciphertext)).decode(),  # Encrypted Tony
         "encrypted_sym_key": bytes(ciphertext_of_sym_key).hex(),
         "conditions": eth_balance_condition,

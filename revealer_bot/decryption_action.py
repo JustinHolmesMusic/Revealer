@@ -2,6 +2,7 @@ import base64
 import io
 import json
 import os
+from typing import cast
 
 from cryptography.fernet import Fernet
 import discord
@@ -10,6 +11,7 @@ import requests
 from nucypher_core import ferveo
 
 from revealer_bot.bob_and_other_networky_things import bob
+from revealer_bot.types import TMK
 
 
 async def decrypt_attached_tmk(message):
@@ -22,7 +24,7 @@ async def decrypt_attached_tmk(message):
 
         try:
             json_str_repr_of_tmk = str(attachment_response.content, encoding="utf-8")
-            tmk_dict = json.loads(json_str_repr_of_tmk)
+            tmk_dict = cast(TMK, json.loads(json_str_repr_of_tmk))
         except:
             await message.reply("wrong file type or something")
             return
