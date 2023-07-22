@@ -1,6 +1,7 @@
 import requests
 import json
 import asyncio
+import aiohttp
 
 
 async def get_lynx_network_status(interaction):
@@ -24,17 +25,17 @@ async def get_lynx_network_status(interaction):
     down_nodes = []
 
 
+    import aiohttp
+
     async def hit_node_status_endpoint(node):
         print(f"Hitting node status endpoint: {node['rest_url']}")
         try:
-            response = requests.get(f"https://{node['rest_url']}/status", verify=False)
-        except IOError as e:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://{node['rest_url']}/status", ssl=False) as response:
+                    if response.status == 200:
+                        up_nodes.append(node)
+        except aiohttp.ClientError as e:
             down_nodes.append(node)
-            return
-
-        if response.status_code == 200:
-            up_nodes.append(node)
-
 
     pings = set()
 
