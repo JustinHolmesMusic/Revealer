@@ -24,9 +24,6 @@ async def get_lynx_network_status(interaction):
     up_nodes = []
     down_nodes = []
 
-
-    import aiohttp
-
     async def hit_node_status_endpoint(node):
         print(f"Hitting node status endpoint: {node['rest_url']}")
         try:
