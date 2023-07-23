@@ -1,15 +1,5 @@
-
-from discord.ext import commands
-
-
-
-
-import os
-from typing import Optional
-
 import discord
 from discord import app_commands
-
 
 JM_MUSIC = discord.Object(id=1126841404056948806)  # replace with your guild id
 
