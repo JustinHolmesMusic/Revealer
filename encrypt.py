@@ -40,9 +40,15 @@ def encapsulate(secret: bytes, clear_text: bytes) -> bytes:
 
 @click.command()
 @click.option(
-    "--file-path", type=str, default="manzana.mp3", help="Path to the file to be encrypted"
+    "--input-file", type=str, default="manzana.mp3", help="Path to the file to be encrypted"
 )
-@click.option("--ritual-id", type=int, help="Ritual ID obtained from a side channel", default=15)
+@click.option(
+    "--ritual-id",
+    type=int,
+    help="Ritual ID obtained from a side channel",
+    default=15,
+    show_default=True,
+)
 @click.option(
     "--coordinator-provider-uri", type=str, help="URI of the coordinator provider", required=True
 )
@@ -59,18 +65,27 @@ def encapsulate(secret: bytes, clear_text: bytes) -> bytes:
     type=str,
     help="Ethereum address for balance check",
     default="0x210eeAC07542F815ebB6FD6689637D8cA2689392",
+    show_default=True,
+)
+@click.option(
+    "--eth-minimum-balance",
+    type=float,
+    help="Ethereum minimum balance condition",
+    default=0,
+    show_default=True,
 )
 @click.option("--output-file", type=str, default="tony.tmk", help="Output file for encrypted data")
 def main(
-    file_path,
-    ritual_id,
-    coordinator_provider_uri,
-    coordinator_network,
-    chain,
-    eth_address,
-    output_file,
+    input_file: str,
+    ritual_id: int,
+    coordinator_provider_uri: str,
+    coordinator_network: str,
+    chain: int,
+    eth_address: str,
+    eth_minimum_balance: float,
+    output_file: str,
 ):
-    file_path = Path(file_path)
+    file_path = Path(input_file)
 
     with open(file_path, "rb") as f:
         clear_text = f.read()
@@ -101,7 +116,7 @@ def main(
             "chain": chain,
             "method": "eth_getBalance",
             "parameters": [eth_address, "latest"],
-            "returnValueTest": {"comparator": "==", "value": 0},
+            "returnValueTest": {"comparator": ">=", "value": eth_minimum_balance},
         },
     }
 
