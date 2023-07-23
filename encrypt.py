@@ -32,9 +32,9 @@ def keygen() -> bytes:
     return _secret
 
 
-def encapsulate(secret: bytes, clear_text: bytes) -> bytes:
+def encapsulate(secret: bytes, cleartext: bytes) -> bytes:
     f = Fernet(secret)
-    capsule = f.encrypt(clear_text)
+    capsule = f.encrypt(cleartext)
     return capsule
 
 
@@ -88,12 +88,12 @@ def main(
     file_path = Path(input_file)
 
     with open(file_path, "rb") as f:
-        clear_text = f.read()
+        cleartext = f.read()
 
     plaintext_of_sym_key = keygen()
 
     secret_hash = keccak(plaintext_of_sym_key)
-    bulk_ciphertext = encapsulate(plaintext_of_sym_key, clear_text)
+    bulk_ciphertext = encapsulate(plaintext_of_sym_key, cleartext)
 
     print("--------- Threshold Encryption ---------")
 
@@ -137,7 +137,7 @@ def main(
 
     f = Fernet(plaintext_of_sym_key)
     hopefully_decrypted = f.decrypt(bulk_ciphertext)
-    assert hopefully_decrypted == clear_text
+    assert hopefully_decrypted == cleartext
 
     ##################
 
