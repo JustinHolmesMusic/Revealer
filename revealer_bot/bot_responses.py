@@ -1,8 +1,5 @@
 import asyncio
-import json
 from typing import Iterable
-
-import requests
 
 
 def bot_is_mentioned_in(message):
@@ -41,6 +38,7 @@ class SimpleReply(BotResponse):
     """
     Reply to a message with a message.
     """
+
     thread = None
 
     async def _construct_and_send_response(self, message):
@@ -51,6 +49,7 @@ class BotActionResponse(BotResponse):
     """
     A bot takes some action in response to a message.
     """
+
     thread = None
 
     async def send_initial_reply_to(self, message):
