@@ -2706,7 +2706,7 @@ ursula = ["prometheus_client", "sentry-sdk"]
 type = "git"
 url = "https://github.com/nucypher/nucypher.git"
 reference = "development"
-resolved_reference = "c65fdb53b1a8c8fcca0a841fa4c5edd0abf60e40"
+resolved_reference = "b0e057423f65be2d8a561906cb206b8674297008"
 
 [[package]]
 name = "nucypher-core"
@@ -5070,4 +5070,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.11"
-content-hash = "fcdd9e98fb0aa73712b1244d9d251877152745899fe84bdb3d7b7efdb1847412"
+content-hash = "c37c914f6a5655285f20327ad5d97e06855b342aac2d330da2bd8a9a4ed9a593"

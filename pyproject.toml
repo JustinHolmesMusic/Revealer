@@ -12,6 +12,7 @@ python = ">=3.8, <3.11"
 discord-py = "^2.3.1"
 python-dotenv = "^1.0.0"
 eth-ape = "^0.6.10"
+pre-commit = "^3.3.2"
 nucypher = {git = "https://github.com/nucypher/nucypher.git", branch = "development", extras = ["dev"]}
 
 [tool.poetry.scripts]
