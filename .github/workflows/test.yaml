@@ -36,6 +36,6 @@ jobs:
           poetry install
 
       - name: Run tests
-        run: | 
+        run: |
           poetry run ape compile --size
           poetry run ape test -s

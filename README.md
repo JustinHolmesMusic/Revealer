@@ -21,9 +21,18 @@ Then run the bot with
 $ poetry run run-revealerbot
 ```
 
-## Solidity smart-contracts testing
+## Development
+
+### Solidity smart-contracts testing
 For testing the solidity contracts, you need to use the ape tool.
 ```
 $ ape plugins install solidity
 $ ape test
 ```
+
+### Automatic code formatting and linting
+Install precommit hook
+```
+$ pre-commit install
+```
+Now the code will be formatted and linted before every commit.
