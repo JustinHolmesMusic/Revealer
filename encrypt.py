@@ -1,8 +1,8 @@
-import argparse
 import base64
 import json
 from pathlib import Path
 
+import click
 from cryptography.fernet import Fernet
 from eth_utils import keccak  # type: ignore
 from nucypher.blockchain.eth.agents import CoordinatorAgent
@@ -38,8 +38,39 @@ def encapsulate(secret: bytes, clear_text: bytes) -> bytes:
     return capsule
 
 
-def main(args):
-    file_path = Path(args.file_path)
+@click.command()
+@click.option(
+    "--file-path", type=str, default="manzana.mp3", help="Path to the file to be encrypted"
+)
+@click.option("--ritual-id", type=int, help="Ritual ID obtained from a side channel", default=15)
+@click.option(
+    "--coordinator-provider-uri", type=str, help="URI of the coordinator provider", required=True
+)
+@click.option(
+    "--coordinator-network",
+    default="mumbai",
+    help="Network for the coordinator",
+    show_default=True,
+    type=click.Choice(["mumbai", "rinkeby", "mainnet", "goerli", "ropsten", "kovan"]),
+)
+@click.option("--chain", type=int, help="Ethereum chain ID", default=80001, show_default=True)
+@click.option(
+    "--eth-address",
+    type=str,
+    help="Ethereum address for balance check",
+    default="0x210eeAC07542F815ebB6FD6689637D8cA2689392",
+)
+@click.option("--output-file", type=str, default="tony.tmk", help="Output file for encrypted data")
+def main(
+    file_path,
+    ritual_id,
+    coordinator_provider_uri,
+    coordinator_network,
+    chain,
+    eth_address,
+    output_file,
+):
+    file_path = Path(file_path)
 
     with open(file_path, "rb") as f:
         clear_text = f.read()
@@ -52,12 +83,9 @@ def main(args):
     print("--------- Threshold Encryption ---------")
 
     coordinator_agent = CoordinatorAgent(
-        provider_uri=args.coordinator_provider_uri,
-        registry=InMemoryContractRegistry.from_latest_publication(
-            network=args.coordinator_network
-        ),
+        provider_uri=coordinator_provider_uri,
+        registry=InMemoryContractRegistry.from_latest_publication(network=coordinator_network),
     )
-    ritual_id = args.ritual_id
     ritual = coordinator_agent.get_ritual(ritual_id)
     enrico = Enrico(encrypting_key=DkgPublicKey.from_bytes(bytes(ritual.public_key)))
 
@@ -70,9 +98,9 @@ def main(args):
     eth_balance_condition: Lingo = {
         "version": ConditionLingo.VERSION,
         "condition": {
-            "chain": args.chain,
+            "chain": chain,
             "method": "eth_getBalance",
-            "parameters": [args.eth_address, "latest"],
+            "parameters": [eth_address, "latest"],
             "returnValueTest": {"comparator": "==", "value": 0},
         },
     }
@@ -100,46 +128,13 @@ def main(args):
 
     tmk_json = json.dumps(tmk)
 
-    filename = args.output_file
-    with open(filename, "w") as file:
+    with open(output_file, "w") as file:
         data = tmk_json
         file.write(data)
-        print(f"Wrote {len(data)} bytes to {filename}")
+        print(f"Wrote {len(data)} bytes to {output_file}")
 
     print("Keccak hash of plaintext sym key: ", secret_hash.hex())
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Encrypt file using threshold encryption.")
-    parser.add_argument(
-        "--file_path", type=str, default="manzana.mp3", help="Path to the file to be encrypted"
-    )
-    parser.add_argument(
-        "--ritual_id", type=int, help="Ritual ID obtained from a side channel", default=15
-    )
-    parser.add_argument(
-        "--coordinator_provider_uri",
-        type=str,
-        help="URI of the coordinator provider",
-        required=True,
-    )
-    parser.add_argument(
-        "--coordinator_network",
-        type=str,
-        default="mumbai",
-        help="Network for the coordinator",
-        choices=["mumbai", "rinkeby", "mainnet", "goerli", "ropsten", "kovan"],
-    )
-    parser.add_argument("--chain", type=int, help="Ethereum chain ID", default=80001)
-    parser.add_argument(
-        "--eth_address",
-        type=str,
-        help="Ethereum address for balance check",
-        default="0x210eeAC07542F815ebB6FD6689637D8cA2689392",
-    )
-    parser.add_argument(
-        "--output-file", type=str, default="tony.tmk", help="Output file for encrypted data"
-    )
-
-    args = parser.parse_args()
-    main(args)
+    main()
