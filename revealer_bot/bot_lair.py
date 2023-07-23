@@ -3,6 +3,7 @@ from discord import app_commands
 
 JM_MUSIC_GUILD_ID = discord.Object(id=1126841404056948806)  # replace with your guild id
 
+
 class RevealerBotDiscordClient(discord.Client):
     def __init__(self, *, intents: discord.Intents):
         super().__init__(intents=intents)

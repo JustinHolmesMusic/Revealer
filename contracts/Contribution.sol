@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract Contribution {
-    
+
     // roles
     address public immutable owner;
     address payable public immutable beneficiary;
@@ -22,7 +22,7 @@ contract Contribution {
 
     // testnet mode
     bool public testnet;
-    
+
     // contributions storage
     mapping(address => uint256[]) public contributionsByAddress;
     address[] public contributors;
