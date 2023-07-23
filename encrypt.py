@@ -1,5 +1,3 @@
-import base64
-import json
 from pathlib import Path
 
 import click
@@ -12,7 +10,7 @@ from nucypher.policy.conditions.lingo import ConditionLingo, Lingo
 from nucypher.utilities.logging import GlobalLoggerSettings
 from nucypher_core.ferveo import DkgPublicKey
 
-from revealer_bot.types import TMK
+from revealer_bot.tmk import TMK, Payload, decrypt, encapsulate
 
 ######################
 # Boring setup stuff #
@@ -30,12 +28,6 @@ GlobalLoggerSettings.start_console_logging()
 def keygen() -> bytes:
     _secret = Fernet.generate_key()
     return _secret
-
-
-def encapsulate(secret: bytes, cleartext: bytes) -> bytes:
-    f = Fernet(secret)
-    capsule = f.encrypt(cleartext)
-    return capsule
 
 
 @click.command()
@@ -88,12 +80,13 @@ def main(
     file_path = Path(input_file)
 
     with open(file_path, "rb") as f:
-        cleartext = f.read()
+        file_content = f.read()
+
+    payload = Payload(file_content=file_content, metadata={"filename": file_path.name})
 
     plaintext_of_sym_key = keygen()
-
     secret_hash = keccak(plaintext_of_sym_key)
-    bulk_ciphertext = encapsulate(plaintext_of_sym_key, cleartext)
+    bulk_ciphertext = encapsulate(plaintext_of_sym_key, payload.to_bytes())
 
     print("--------- Threshold Encryption ---------")
 
@@ -124,31 +117,29 @@ def main(
         plaintext=plaintext_of_sym_key, conditions=eth_balance_condition
     )
 
-    tmk: TMK = {
-        "bulk_ciphertext": base64.b64encode(bytes(bulk_ciphertext)).decode(),  # Encrypted Tony
-        "encrypted_sym_key": bytes(ciphertext_of_sym_key).hex(),
-        "conditions": eth_balance_condition,
-        "filename": file_path.name,
-    }
+    tmk = TMK(
+        bulk_ciphertext=bulk_ciphertext,
+        encrypted_sym_key=bytes(ciphertext_of_sym_key),
+        conditions=eth_balance_condition,
+    )
 
-    ################
-    # Sanity check #
-    ################
-
-    f = Fernet(plaintext_of_sym_key)
-    hopefully_decrypted = f.decrypt(bulk_ciphertext)
-    assert hopefully_decrypted == cleartext
-
-    ##################
-
-    tmk_json = json.dumps(tmk)
-
-    with open(output_file, "w") as file:
-        data = tmk_json
+    with open(output_file, "wb") as file:
+        data = tmk.to_bytes()
         file.write(data)
         print(f"Wrote {len(data)} bytes to {output_file}")
 
     print("Keccak hash of plaintext sym key: ", secret_hash.hex())
+    ################
+    # Sanity check #
+    ################
+
+    hopefully_tmk = TMK.from_bytes(data)
+    hopefully_cleartext = decrypt(
+        ciphertext=hopefully_tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_sym_key
+    )
+    hopefully_payload = Payload.from_bytes(hopefully_cleartext)
+    assert hopefully_payload.metadata["filename"] == payload.metadata["filename"]
+    assert hopefully_payload.file_content == payload.file_content
 
 
 if __name__ == "__main__":
