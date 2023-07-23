@@ -4,13 +4,14 @@ import json
 from pathlib import Path
 
 from cryptography.fernet import Fernet
-from eth_utils import keccak # type: ignore
+from eth_utils import keccak  # type: ignore
 from nucypher.blockchain.eth.agents import CoordinatorAgent
 from nucypher.blockchain.eth.registry import InMemoryContractRegistry
 from nucypher.characters.lawful import Enrico
 from nucypher.policy.conditions.lingo import ConditionLingo, Lingo
 from nucypher.utilities.logging import GlobalLoggerSettings
 from nucypher_core.ferveo import DkgPublicKey
+
 from revealer_bot.types import TMK
 
 ######################
@@ -45,8 +46,6 @@ def main(args):
 
     plaintext_of_sym_key = keygen()
 
-    # TODO: what do we do with this secret hash?
-    # It's not used anywhere atm.
     secret_hash = keccak(plaintext_of_sym_key)
     bulk_ciphertext = encapsulate(plaintext_of_sym_key, clear_text)
 
@@ -54,27 +53,29 @@ def main(args):
 
     coordinator_agent = CoordinatorAgent(
         provider_uri=args.coordinator_provider_uri,
-        registry=InMemoryContractRegistry.from_latest_publication(network=args.coordinator_network),
+        registry=InMemoryContractRegistry.from_latest_publication(
+            network=args.coordinator_network
+        ),
     )
     ritual_id = args.ritual_id
     ritual = coordinator_agent.get_ritual(ritual_id)
     enrico = Enrico(encrypting_key=DkgPublicKey.from_bytes(bytes(ritual.public_key)))
 
     print(
-        f"Fetched DKG public key {bytes(enrico.policy_pubkey).hex()} " # type: ignore
+        f"Fetched DKG public key {bytes(enrico.policy_pubkey).hex()} "  # type: ignore
         f"for ritual #{ritual_id} "
         f"from Coordinator {coordinator_agent.contract.address}"
     )
 
     eth_balance_condition: Lingo = {
-            "version": ConditionLingo.VERSION,
-            "condition": {
-                "chain": args.chain,
-                "method": "eth_getBalance",
-                "parameters": [args.eth_address, "latest"],
-                "returnValueTest": {"comparator": "==", "value": 0},
-            },
-        }
+        "version": ConditionLingo.VERSION,
+        "condition": {
+            "chain": args.chain,
+            "method": "eth_getBalance",
+            "parameters": [args.eth_address, "latest"],
+            "returnValueTest": {"comparator": "==", "value": 0},
+        },
+    }
 
     ciphertext_of_sym_key = enrico.encrypt_for_dkg(
         plaintext=plaintext_of_sym_key, conditions=eth_balance_condition
@@ -105,16 +106,40 @@ def main(args):
         file.write(data)
         print(f"Wrote {len(data)} bytes to {filename}")
 
+    print("Keccak hash of plaintext sym key: ", secret_hash.hex())
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Encrypt file using threshold encryption.")
-    parser.add_argument("--file_path", type=str, default="manzana.mp3", help="Path to the file to be encrypted")
-    parser.add_argument("--ritual_id", type=int, help="Ritual ID obtained from a side channel", default=15)
-    parser.add_argument("--coordinator_provider_uri", type=str, help="URI of the coordinator provider", required=True)
-    parser.add_argument("--coordinator_network", type=str, default="mumbai", help="Network for the coordinator", choices=["mumbai", "rinkeby", "mainnet", "goerli", "ropsten", "kovan"])
+    parser.add_argument(
+        "--file_path", type=str, default="manzana.mp3", help="Path to the file to be encrypted"
+    )
+    parser.add_argument(
+        "--ritual_id", type=int, help="Ritual ID obtained from a side channel", default=15
+    )
+    parser.add_argument(
+        "--coordinator_provider_uri",
+        type=str,
+        help="URI of the coordinator provider",
+        required=True,
+    )
+    parser.add_argument(
+        "--coordinator_network",
+        type=str,
+        default="mumbai",
+        help="Network for the coordinator",
+        choices=["mumbai", "rinkeby", "mainnet", "goerli", "ropsten", "kovan"],
+    )
     parser.add_argument("--chain", type=int, help="Ethereum chain ID", default=80001)
-    parser.add_argument("--eth_address", type=str, help="Ethereum address for balance check", default="0x210eeAC07542F815ebB6FD6689637D8cA2689392")
-    parser.add_argument("--output-file", type=str, default="tony.tmk", help="Output file for encrypted data")
+    parser.add_argument(
+        "--eth_address",
+        type=str,
+        help="Ethereum address for balance check",
+        default="0x210eeAC07542F815ebB6FD6689637D8cA2689392",
+    )
+    parser.add_argument(
+        "--output-file", type=str, default="tony.tmk", help="Output file for encrypted data"
+    )
 
     args = parser.parse_args()
     main(args)

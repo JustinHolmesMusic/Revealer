@@ -1,9 +1,7 @@
 import pytest
-import json
 from nucypher.characters.chaotic import NiceGuyEddie as _Enrico
-from nucypher.characters.chaotic import ThisBobAlwaysDecrypts as _Bob
-from nucypher.policy.conditions.lingo import ConditionLingo
 from nucypher.policy.conditions.evm import _CONDITION_CHAINS
+from nucypher.policy.conditions.lingo import ConditionLingo
 from web3 import Web3
 
 
@@ -71,12 +69,12 @@ def contract_address(contribution):
 
 @pytest.fixture
 def dummy_key_base64():
-    return b'6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM='
+    return b"6G4O0AusEgrJ_maWYYiM5i_S1OtznIYcjRsehJjplEM="
 
 
 @pytest.fixture
 def dummy_key_ciphertext_base64():
-    return b'gAAAAABkqYAnoyOibrOGDpql3D58PQn_UXw9o-xCPtEF1sxEHMc8TknAcJMqO2MCzWDsVD5TJ9AhYGZmnfVLYGavp7ch_BdZmR9sAIsYUUUNDRQGK-7tlXI='
+    return b"gAAAAABkqYAnoyOibrOGDpql3D58PQn_UXw9o-xCPtEF1sxEHMc8TknAcJMqO2MCzWDsVD5TJ9AhYGZmnfVLYGavp7ch_BdZmR9sAIsYUUUNDRQGK-7tlXI="
 
 
 @pytest.fixture
@@ -92,7 +90,7 @@ def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
     THIS_IS_NOT_A_TRINKET = 2  # sometimes called "public key"
 
     enrico = _Enrico(encrypting_key=THIS_IS_NOT_A_TRINKET)
-    bob = _Bob(domain=coordinator_network, eth_provider_uri=coordinator_provider_uri)
+    # bob = _Bob(domain=coordinator_network, eth_provider_uri=coordinator_provider_uri)
 
     ANYTHING_CAN_BE_PASSED_AS_RITUAL_ID = 55
 
@@ -103,7 +101,13 @@ def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
             "method": "isReleased",
             "contractAddress": contract_address,
             "returnValueTest": {"comparator": "==", "value": True},
-            "functionAbi": {"inputs":[],"name":"isReleased","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+            "functionAbi": {
+                "inputs": [],
+                "name": "isReleased",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function",
+            },
         },
     }
 
