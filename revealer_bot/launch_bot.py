@@ -1,11 +1,10 @@
 import os
 
-from bot_lair import the_actual_revealer_bot
-from revealer_commands import *  # noqa
+from dotenv import load_dotenv
 
 from revealer_bot.bob_and_other_networky_things import bob
-
-bot_token = os.environ["DISCORD_BOT_TOKEN"]
+from revealer_bot.bot_lair import the_actual_revealer_bot
+from revealer_bot.revealer_commands import *  # noqa
 
 
 @the_actual_revealer_bot.event
@@ -14,5 +13,12 @@ async def on_ready():
     print("------synced------")
 
 
-the_actual_revealer_bot.run(bot_token)
-bob.start_learning_loop()
+def main():
+    load_dotenv()
+    bot_token = os.environ["DISCORD_BOT_TOKEN"]
+    the_actual_revealer_bot.run(bot_token)
+    bob.start_learning_loop()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,7 +1,5 @@
-from bot_responses import SimpleReply
-from built_in_messages import simple_reply_defaults
-
-from revealer_bot.bot_responses import BotActionResponse
+from revealer_bot.bot_responses import BotActionResponse, SimpleReply
+from revealer_bot.built_in_messages import simple_reply_defaults
 
 available_responses = list()
 for prompt, reply in simple_reply_defaults:
