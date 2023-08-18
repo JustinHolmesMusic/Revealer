@@ -14,8 +14,6 @@ contract Contribution {
     uint256 public threshold;
     uint256 public minContribution;
 
-
-
     // commit and reveal
     bool public isKeySet = false;
     bytes32 public keyPlaintextHash;
@@ -28,7 +26,9 @@ contract Contribution {
     // contributions storage
     bool[] public contributionIsCombined;
     uint256[] public contributionAmounts;
+    uint256[] public contributionDatetimes;
     address[] public contributorsForEachAContribution;
+
     address public artifactContract;
 
     //events
@@ -119,6 +119,7 @@ contract Contribution {
         contributionAmounts.push(msg.value);
         contributorsForEachAContribution.push(msg.sender);
         contributionIsCombined.push(combine);
+        contributionDatetimes.push(block.timestamp);
 
         if (address(this).balance >= threshold && !materialReleaseConditionMet) {
             materialReleaseConditionMet = true;  // BOOM! Release the material!
@@ -162,9 +163,9 @@ contract Contribution {
         emit Contribute(msg.sender, msg.value);
     }
 
-    function getAllContributions() external view returns (address[] memory, uint256[] memory, bool[] memory) {
+    function getAllContributions() external view returns (address[] memory, uint256[] memory, bool[] memory, uint256[] memory) {
 
-        return (contributorsForEachAContribution, contributionAmounts, contributionIsCombined);
+        return (contributorsForEachAContribution, contributionAmounts, contributionIsCombined, contributionDatetimes);
     }
 
     function withdraw() external onlyBeneficiary {
