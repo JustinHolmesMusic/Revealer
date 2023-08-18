@@ -129,7 +129,6 @@ contract Contribution {
             deadline = block.timestamp + countdownPeriod;
             emit ClockReset(deadline);
         }
-
         emit Contribute(msg.sender, msg.value);
     }
 
@@ -143,27 +142,33 @@ contract Contribution {
 
     function totalContributedByAddress(address contributor) external view returns (uint256) {
         uint256 total = 0;
-        for (uint256 i = 0; i < contributionsByAddress[contributor].length; i++) {
-            total += contributionsByAddress[contributor][i];
+        for (uint256 i = 0; i < contributorsForEachAContribution.length; i++) {
+            if (contributorsForEachAContribution[i] == contributor) {
+                total += contributionAmounts[i];
+            }
         }
         return total;
     }
 
-    function getContributors() external view returns (address[] memory) {
-        return contributors;
-    }
+//    function getContributors() external view returns (address[] memory) {
+//        return contributors;
+//    }
 
-    function getContributionsByAddress(address contributor) external view returns (uint256[] memory) {
-        return contributionsByAddress[contributor];
-    }
+//    function getContributionsByAddress(address contributor) external view returns (uint256[] memory) {
+//        return contributionsByAddress[contributor];
+//    }
 
     receive() external payable {
         emit Contribute(msg.sender, msg.value);
     }
 
+    function getAllContributions() external view returns (address[] memory, uint256[] memory, bool[] memory) {
+
+        return (contributorsForEachAContribution, contributionAmounts, contributionIsCombined);
+    }
+
     function withdraw() external onlyBeneficiary {
         require(materialReleaseConditionMet, "Material has not been set for a release.");
-        require(deadline < block.timestamp, "Cannot withdraw funds before deadline");
         uint256 balance = address(this).balance;
         beneficiary.transfer(balance);
         emit Withdraw(beneficiary, balance);
