@@ -11,7 +11,7 @@ def owner(accounts):
 
 
 @pytest.fixture
-def receiver(accounts):
+def beneficiary(accounts):
     return accounts[1]
 
 
@@ -36,13 +36,13 @@ def threshold():
 
 
 @pytest.fixture
-def contribution(project, receiver, owner, countdownPeriod, threshold, amb):
+def contribution(project, beneficiary, owner, countdownPeriod, threshold, amb):
     return owner.deploy(
         project.Contribution,
         countdownPeriod,
         threshold,
         Web3.to_wei(0.1, "ether"),
-        receiver,
+        beneficiary,
         False,
     )
 
@@ -116,4 +116,14 @@ def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
         plaintext=plaintext,
         conditions=before_the_beginning_of_time,
         ritual_id=ANYTHING_CAN_BE_PASSED_AS_RITUAL_ID,
+    )
+
+
+TESTERCHAIN_CHAIN_ID = 131277322940537
+@pytest.fixture(scope="session", autouse=True)
+def mock_condition_blockchains(session_mocker):
+    """adds testerchain's chain ID to permitted conditional chains"""
+    session_mocker.patch.dict(
+        "nucypher.policy.conditions.evm._CONDITION_CHAINS",
+        {TESTERCHAIN_CHAIN_ID: "eth-tester/pyevm"},
     )
