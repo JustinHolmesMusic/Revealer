@@ -14,6 +14,8 @@ contract Contribution {
     uint256 public threshold;
     uint256 public minContribution;
 
+
+
     // commit and reveal
     bool public isKeySet = false;
     bytes32 public keyPlaintextHash;
@@ -24,8 +26,9 @@ contract Contribution {
     bool public testnet;
 
     // contributions storage
-    mapping(address => uint256[]) public contributionsByAddress;
-    address[] public contributors;
+    bool[] public contributionIsCombined;
+    uint256[] public contributionAmounts;
+    address[] public contributorsForEachAContribution;
     address public artifactContract;
 
     //events
@@ -107,24 +110,18 @@ contract Contribution {
     }
 
     function _contribute(bool combine) internal {
-        require(isKeySet, "Key has not been set.");
+        require(isKeySet, "Material is not ready for contributions yet.");
         require(!materialReleaseConditionMet || block.timestamp < deadline,
             "Cannot contribute after the deadline");
         require(msg.value >= minContribution,
             "Contribution must be equal to or greater than the minimum.");
 
-        if (contributionsByAddress[msg.sender].length == 0) { // If this is the first contribution from this address
-            contributors.push(msg.sender); // Add the address to the contributors array
-        }
-
-        if (combine) {
-            contributionsByAddress[msg.sender][0] += msg.value;
-        } else {
-            contributionsByAddress[msg.sender].push(msg.value); // Add contribution to the mapping
-        }
+        contributionAmounts.push(msg.value);
+        contributorsForEachAContribution.push(msg.sender);
+        contributionIsCombined.push(combine);
 
         if (address(this).balance >= threshold && !materialReleaseConditionMet) {
-            materialReleaseConditionMet = true;
+            materialReleaseConditionMet = true;  // BOOM! Release the material!
             emit Decryptable(msg.sender);
         }
 
