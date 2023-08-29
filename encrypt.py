@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import json
 import click
 from cryptography.fernet import Fernet
 from eth_utils import keccak  # type: ignore
@@ -156,6 +156,14 @@ def main(
         assert hopefully_payload.file_content == plaintext.file_content
 
     print("Keccak hash of plaintext sym key: ", secret_hash.hex())
+    print("Ciphertext of sym key: ", bytes(ciphertext_of_sym_key).hex())
+
+    with open(Path(output_dir) / "encryption_metadata.json", "w") as f:
+        encryption_metadata = {
+            "ciphertext": bytes(ciphertext_of_sym_key).hex(),
+            "secret_hash": secret_hash.hex(),
+        }
+        f.write(json.dumps(encryption_metadata, indent=4))
 
     if spill_secret_hazmat_hazmat_i_know_what_i_am_doing:
         print("Here is the sym key:")
