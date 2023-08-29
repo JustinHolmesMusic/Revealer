@@ -1,16 +1,15 @@
-from pathlib import Path
-
 import click
 from cryptography.fernet import Fernet
 from eth_utils import keccak  # type: ignore
+from nucypher_core.ferveo import DkgPublicKey
+from pathlib import Path
+
 from nucypher.blockchain.eth.agents import CoordinatorAgent
 from nucypher.blockchain.eth.registry import InMemoryContractRegistry
 from nucypher.characters.lawful import Enrico
 from nucypher.policy.conditions.lingo import ConditionLingo, Lingo
 from nucypher.utilities.logging import GlobalLoggerSettings
-from nucypher_core.ferveo import DkgPublicKey
-
-from revealer_bot.tmk import TMK, Payload, decrypt, encapsulate
+from revealer_bot.tmk import TMK, FilePlaintext, decrypt, encapsulate
 
 ######################
 # Boring setup stuff #
@@ -19,6 +18,7 @@ from revealer_bot.tmk import TMK, Payload, decrypt, encapsulate
 LOG_LEVEL = "info"
 GlobalLoggerSettings.set_log_level(log_level_name=LOG_LEVEL)
 GlobalLoggerSettings.start_console_logging()
+
 
 #####################
 # Scully the Symmet
@@ -32,7 +32,10 @@ def keygen() -> bytes:
 
 @click.command()
 @click.option(
-    "--input-file", type=str, default="manzana.mp3", help="Path to the file to be encrypted"
+    "--input-dir", type=str, help="Path to the file to be encrypted"
+)
+@click.option(
+    "--spill-secret-hazmat-hazmat-i-know-what-i-am-doing", is_flag=True, help="Spill the secret to stdout",
 )
 @click.option(
     "--ritual-id",
