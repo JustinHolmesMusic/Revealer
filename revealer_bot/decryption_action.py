@@ -30,11 +30,12 @@ async def decrypt_attached_tmk(message):
         ######### BAAAAAAHB ########
 
         plaintext_of_symkey = bob.threshold_decrypt(
-            ritual_id=15,  # Cuz 15
+            ritual_id=91,  # Cuz 91
             ciphertext=ciphertext_to_decrypt_with_threshold,
             conditions=tmk.conditions,
         )
 
+        plaintext_of_symkey = bytes(plaintext_of_symkey)
         cleartext = decrypt(
             ciphertext=tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_symkey
         )
