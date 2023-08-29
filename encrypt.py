@@ -67,27 +67,37 @@ def keygen() -> bytes:
     default=0,
     show_default=True,
 )
-@click.option("--output-file", type=str, default="tony.tmk", help="Output file for encrypted data")
+@click.option("--output-dir", type=str, required=False, help="Output file for encrypted data")
 def main(
-    input_file: str,
-    ritual_id: int,
-    coordinator_provider_uri: str,
-    coordinator_network: str,
-    chain: int,
-    eth_address: str,
-    eth_minimum_balance: float,
-    output_file: str,
+        input_dir: str,
+        ritual_id: int,
+        coordinator_provider_uri: str,
+        coordinator_network: str,
+        chain: int,
+        eth_address: str,
+        eth_minimum_balance: float,
+        output_dir: str,
+        spill_secret_hazmat_hazmat_i_know_what_i_am_doing: bool,
+
 ):
-    file_path = Path(input_file)
+    if output_dir is None:
+        output_dir = input_dir
 
-    with open(file_path, "rb") as f:
-        file_content = f.read()
+    # Iterate through the files in input_dir
+    dir_path = Path(input_dir)
 
-    payload = Payload(file_content=file_content, metadata={"filename": file_path.name})
+    file_plaintexts = []
+
+    for file_path in dir_path.iterdir():
+        with open(file_path, "rb") as f:
+            file_content = f.read()
+
+        file_plaintext = FilePlaintext(file_content=file_content, metadata={"filename": file_path.name})
+        file_plaintexts.append(file_plaintext)
 
     plaintext_of_sym_key = keygen()
+
     secret_hash = keccak(plaintext_of_sym_key)
-    bulk_ciphertext = encapsulate(plaintext_of_sym_key, payload.to_bytes())
 
     print("--------- Threshold Encryption ---------")
 
@@ -107,6 +117,7 @@ def main(
     eth_balance_condition: Lingo = {
         "version": ConditionLingo.VERSION,
         "condition": {
+            "conditionType": 'rpc',
             "chain": chain,
             "method": "eth_getBalance",
             "parameters": [eth_address, "latest"],
@@ -118,29 +129,47 @@ def main(
         plaintext=plaintext_of_sym_key, conditions=eth_balance_condition
     )
 
-    tmk = TMK(
-        bulk_ciphertext=bulk_ciphertext,
-        encrypted_sym_key=bytes(ciphertext_of_sym_key),
-        conditions=eth_balance_condition,
-    )
+    # Encrypt all the files in the directory
 
-    with open(output_file, "wb") as file:
-        data = tmk.to_bytes()
-        file.write(data)
-        print(f"Wrote {len(data)} bytes to {output_file}")
+    payloads = {}
+
+    for plaintext in file_plaintexts:
+        filename_to_encrypt = plaintext.metadata["filename"]
+        print("Encrypting", filename_to_encrypt)
+        payload = encapsulate(plaintext_of_sym_key, plaintext.to_bytes())
+        tmk = TMK(
+            bulk_ciphertext=payload,
+            encrypted_sym_key=bytes(ciphertext_of_sym_key),
+            conditions=eth_balance_condition,
+        )
+
+        # We'll write to the output_path for this filename
+        new_filename = filename_to_encrypt + ".encrypted"
+        output_filepath = Path(output_dir) / new_filename
+
+        with open(output_filepath, "wb") as file:
+            data = tmk.to_bytes()
+            file.write(data)
+            print(f"Wrote {len(data)} bytes to {output_filepath}")
+
+        ################
+        # Sanity check #
+        ################
+
+        hopefully_tmk = TMK.from_bytes(data)
+        hopefully_cleartext = decrypt(
+            ciphertext=hopefully_tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_sym_key
+        )
+        hopefully_payload = FilePlaintext.from_bytes(hopefully_cleartext)
+        assert hopefully_payload.metadata["filename"] == filename_to_encrypt
+        assert hopefully_payload.file_content == plaintext.file_content
 
     print("Keccak hash of plaintext sym key: ", secret_hash.hex())
-    ################
-    # Sanity check #
-    ################
 
-    hopefully_tmk = TMK.from_bytes(data)
-    hopefully_cleartext = decrypt(
-        ciphertext=hopefully_tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_sym_key
-    )
-    hopefully_payload = Payload.from_bytes(hopefully_cleartext)
-    assert hopefully_payload.metadata["filename"] == payload.metadata["filename"]
-    assert hopefully_payload.file_content == payload.file_content
+    if spill_secret_hazmat_hazmat_i_know_what_i_am_doing:
+        print("Here is the sym key:")
+        print(plaintext_of_sym_key.hex())
+        print("Above is the sym key.")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import requests
 from nucypher_core import ferveo
 
 from revealer_bot.bob_and_other_networky_things import bob
-from revealer_bot.tmk import TMK, Payload, decrypt
+from revealer_bot.tmk import TMK, FilePlaintext, decrypt
 
 
 async def decrypt_attached_tmk(message):
@@ -38,7 +38,7 @@ async def decrypt_attached_tmk(message):
         cleartext = decrypt(
             ciphertext=tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_symkey
         )
-        payload = Payload.from_bytes(cleartext)
+        payload = FilePlaintext.from_bytes(cleartext)
         filelike = io.BytesIO(payload.file_content)
 
         await message.reply(

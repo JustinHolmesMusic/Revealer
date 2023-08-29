@@ -10,7 +10,7 @@ BulkCipherText = NewType("BulkCipherText", bytes)
 
 
 @dataclass
-class Payload:
+class FilePlaintext:
     file_content: bytes
     metadata: dict[str, Any]
 
@@ -21,7 +21,7 @@ class Payload:
         return serialized_data
 
     @classmethod
-    def from_bytes(cls, serialized_data: ClearText) -> "Payload":
+    def from_bytes(cls, serialized_data: ClearText) -> "FilePlaintext":
         # Deserialize the bytes to a dictionary using MessagePack
         data_dict: dict[str, Any] = msgpack.unpackb(serialized_data)
         return cls(**data_dict)
