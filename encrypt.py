@@ -41,8 +41,6 @@ def keygen() -> bytes:
     "--ritual-id",
     type=int,
     help="Ritual ID obtained from a side channel",
-    default=15,
-    show_default=True,
 )
 @click.option(
     "--coordinator-provider-uri", type=str, help="URI of the coordinator provider", required=True
