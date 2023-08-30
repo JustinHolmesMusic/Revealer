@@ -1,16 +1,22 @@
 from __future__ import annotations
-import base64
+
 from typing import List
 
 import ape
 import pytest
 from web3 import Web3
 
-from utilities.contribution_utilities import calculate_leaders
+from revealer_bot.utils import calculate_leaders
 
 
-def test_properties(chain, contribution: ape.Contract, owner: ape.Account, beneficiary: ape.Account, threshold: int,
-                    countdownPeriod: int):
+def test_properties(
+    chain,
+    contribution: ape.Contract,
+    owner: ape.Account,
+    beneficiary: ape.Account,
+    threshold: int,
+    countdownPeriod: int,
+):
     assert owner == contribution.owner()
     assert beneficiary == contribution.beneficiary()
     assert contribution.countdownPeriod() == countdownPeriod
@@ -26,8 +32,13 @@ def commit_secret(
     contribution.commitSecret(dummy_key_hash, dummy_key_ciphertext_base64, sender=owner)
 
 
-def test_set_secret(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, dummy_key_ciphertext_base64,
-                    dummy_key_hash):
+def test_set_secret(
+    contribution: ape.Contract,
+    owner: ape.Account,
+    not_owner: ape.Account,
+    dummy_key_ciphertext_base64,
+    dummy_key_hash,
+):
     # only owner can set secret
 
     assert contribution.isKeySet() == False
@@ -46,8 +57,14 @@ def test_set_secret(contribution: ape.Contract, owner: ape.Account, not_owner: a
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_reveal_secret(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, dummy_key_base64,
-                       dummy_key_hash, threshold: int):
+def test_reveal_secret(
+    contribution: ape.Contract,
+    owner: ape.Account,
+    not_owner: ape.Account,
+    dummy_key_base64,
+    dummy_key_hash,
+    threshold: int,
+):
     with ape.reverts("Material has not been set for a release."):
         contribution.revealSecret(dummy_key_base64, sender=owner)
 
@@ -59,8 +76,13 @@ def test_reveal_secret(contribution: ape.Contract, owner: ape.Account, not_owner
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_not_being_able_to_contribute_after_deadline(chain: ape.chain, contribution: ape.Contract, owner: ape.Account,
-                                                     not_owner: ape.Account, countdownPeriod: int):
+def test_not_being_able_to_contribute_after_deadline(
+    chain: ape.chain,
+    contribution: ape.Contract,
+    owner: ape.Account,
+    not_owner: ape.Account,
+    countdownPeriod: int,
+):
 
     # contribution before deadline should work
     # transfer 1 wei from not_owner to contribution contract
@@ -96,7 +118,7 @@ def test_not_being_able_to_contribute_after_deadline(chain: ape.chain, contribut
     assert contribution.deadline() - chain.pending_timestamp < countdownPeriod
 
     # The ClockReset event has never been emitted
-    clock_reset_query = contribution.ClockReset.query('*')
+    clock_reset_query = contribution.ClockReset.query("*")
     len(clock_reset_query) == 0
 
     # We can still contribute - this causes the deadline to advance.
@@ -106,7 +128,7 @@ def test_not_being_able_to_contribute_after_deadline(chain: ape.chain, contribut
     assert contribution.deadline() - chain.blocks.head.timestamp == countdownPeriod
 
     # ...and the ClockReset event was emitted.
-    clock_reset_query = contribution.ClockReset.query('*')
+    clock_reset_query = contribution.ClockReset.query("*")
     len(clock_reset_query) == 1
 
     # We'll advance one more time, more than a whole countdownPeriod..
@@ -121,8 +143,13 @@ def test_not_being_able_to_contribute_after_deadline(chain: ape.chain, contribut
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_album_release(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account, beneficiary: ape.Account,
-                       threshold: int):
+def test_album_release(
+    contribution: ape.Contract,
+    owner: ape.Account,
+    not_owner: ape.Account,
+    beneficiary: ape.Account,
+    threshold: int,
+):
     # get balance of the contribution contract
     assert contribution.balance == 0
     assert contribution.materialReleaseConditionMet() == False
@@ -136,7 +163,9 @@ def test_album_release(contribution: ape.Contract, owner: ape.Account, not_owner
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_contribute_mapping(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account):
+def test_contribute_mapping(
+    contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account
+):
     contribution.contribute(sender=not_owner, value=Web3.to_wei(1, "ether"))
     assert contribution.balance == Web3.to_wei(1, "ether")
     assert contribution.totalContributedByAddress(not_owner) == Web3.to_wei(1, "ether")
@@ -158,10 +187,15 @@ def test_contribute_mapping(contribution: ape.Contract, owner: ape.Account, not_
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_withdraw_funds_after_deadline_threshold_not_met(chain: ape.chain, contribution: ape.Contract,
-                                                         owner: ape.Account, not_owner: ape.Account,
-                                                         beneficiary: ape.Account, threshold: int,
-                                                         countdownPeriod: int):
+def test_withdraw_funds_after_deadline_threshold_not_met(
+    chain: ape.chain,
+    contribution: ape.Contract,
+    owner: ape.Account,
+    not_owner: ape.Account,
+    beneficiary: ape.Account,
+    threshold: int,
+    countdownPeriod: int,
+):
     beneficiary_balance_before = beneficiary.balance
 
     contribution_amount = threshold // 4
@@ -192,15 +226,23 @@ def test_withdraw_funds_after_deadline_threshold_not_met(chain: ape.chain, contr
     # this doesn't work because of the gas cost
     # assert beneficiary.balance == beneficiary_balance_before + contribution_amount * 2
 
-    assert beneficiary.balance >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
+    assert (
+        beneficiary.balance
+        >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
+    )
     assert contribution.balance == 0
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_withdraw_funds_after_deadline_fulfilled_threshold(chain: ape.chain, contribution: ape.Contract,
-                                                           owner: ape.Account, not_owner: ape.Account,
-                                                           beneficiary: ape.Account, threshold: int,
-                                                           countdownPeriod: int):
+def test_withdraw_funds_after_deadline_fulfilled_threshold(
+    chain: ape.chain,
+    contribution: ape.Contract,
+    owner: ape.Account,
+    not_owner: ape.Account,
+    beneficiary: ape.Account,
+    threshold: int,
+    countdownPeriod: int,
+):
     beneficiary_balance_before = beneficiary.balance
 
     contribution_amount = int(threshold * 2 / 3)
@@ -218,20 +260,25 @@ def test_withdraw_funds_after_deadline_fulfilled_threshold(chain: ape.chain, con
     # this doesn't work because of the gas cost
     # assert beneficiary.balance == beneficiary_balance_before + contribution_amount * 2
 
-    assert beneficiary.balance >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
+    assert (
+        beneficiary.balance
+        >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
+    )
     assert contribution.balance == 0
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_contributors_collation(chain: ape.chain,
-                                contribution: ape.Contract,
-                                accounts: List[ape.Account],
-                                beneficiary: ape.Account,
-                                threshold: int,
-                                countdownPeriod: int):
-    beneficiary_balance_before = beneficiary.balance
+def test_contributors_collation(
+    chain: ape.chain,
+    contribution: ape.Contract,
+    accounts: List[ape.Account],
+    beneficiary: ape.Account,
+    threshold: int,
+    countdownPeriod: int,
+):
+    # beneficiary_balance_before = beneficiary.balance
 
-    half_an_ether = Web3.to_wei(.5, "ether")
+    half_an_ether = Web3.to_wei(0.5, "ether")
     two_ether = Web3.to_wei(2, unit="ether")
     two_and_a_half_ether = Web3.to_wei(2.5, unit="ether")
 
@@ -254,8 +301,20 @@ def test_contributors_collation(chain: ape.chain,
 
     contribution_metadata_part_two = contribution.getAllContributions()
 
-    contributions_by_address_after_first_contributor_took_the_lead = calculate_leaders(contribution_metadata_part_two)
+    contributions_by_address_after_first_contributor_took_the_lead = calculate_leaders(
+        contribution_metadata_part_two
+    )
 
-    assert contributions_by_address_after_first_contributor_took_the_lead[first_contributor.address][0] == two_and_a_half_ether
-    assert contributions_by_address_after_first_contributor_took_the_lead[second_contributor.address][0] == two_ether
+    assert (
+        contributions_by_address_after_first_contributor_took_the_lead[first_contributor.address][
+            0
+        ]
+        == two_and_a_half_ether
+    )
 
+    assert (
+        contributions_by_address_after_first_contributor_took_the_lead[second_contributor.address][
+            0
+        ]
+        == two_ether
+    )

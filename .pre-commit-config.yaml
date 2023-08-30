@@ -24,7 +24,7 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        args: ["--ignore=E501,E266,E712"]
+        args: ["--ignore=E501,E266,E712,W503"]
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.29.0

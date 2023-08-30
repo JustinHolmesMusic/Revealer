@@ -9,7 +9,7 @@ def calculate_leaders(contribution_metadata) -> Dict[str, int]:
     contributors = contribution_metadata[0]
     amounts = contribution_metadata[1]
     combined = contribution_metadata[2]
-    datetime = contribution_metadata[3]
+    datetime = contribution_metadata[3]  # noqa
 
     contributors_by_address = defaultdict(list)
 
