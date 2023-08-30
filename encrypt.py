@@ -99,10 +99,7 @@ def main(
         "version": "1.0.0",
         "condition": {
             "conditionType": "contract",
-            # Contract with min bid of 0.001 ETH and threshold of 0.1 ETH
-            "contractAddress": "0xb96A231384eEeA72A0EDF8b2e896FA4BaCAa22fF",
-            # Contract with min bid of 0.1 ETH and threshold of 10 ETH
-            # "contractAddress": "0x6Fc000Ba711d333427670482853A4604A3Bc0E03",
+            "contractAddress": "0x96ebdf35199219BDd16E3c3E1aD8C89C9185b734",  # contract with initialWindow
             "functionAbi": {
                 "inputs": [],
                 "name": "materialReleaseConditionMet",
