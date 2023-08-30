@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "revealer-bot"
+version = "0.1.0"
+description = "A package for revealing hidden messages using Threshold conditional access"
+authors = ["Justin Myles Holmes <justin@justinholmes.com>"]
+license = "GPLv3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+# limiting to python 3.10 for now, had trouble with pysha3 on 3.11
+python = ">=3.8, <=3.11"
+discord-py = "^2.3.1"
+python-dotenv = "^1.0.0"
+eth-ape = "^0.6.10"
+pre-commit = "^3.3.2"
+# nucypher = {git = "https://github.com/nucypher/nucypher.git", branch = "development", extras = ["dev"]}
+nucypher = {git = "https://github.com/nucypher/nucypher.git", tag = "dkg-dev-11", extras = ["dev"]}
+
+nucypher-core = "0.11.0" # this raises an error, because of dependency spec error in nucypher's dkg-dev-11 tag
+
+[tool.poetry.scripts]
+run-revealerbot = "revealer_bot.launch_bot:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

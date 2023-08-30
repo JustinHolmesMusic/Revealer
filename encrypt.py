@@ -1,14 +1,16 @@
+import json
+from pathlib import Path
+
 import click
 from cryptography.fernet import Fernet
 from eth_utils import keccak  # type: ignore
-from nucypher_core.ferveo import DkgPublicKey
-from pathlib import Path
-
 from nucypher.blockchain.eth.agents import CoordinatorAgent
 from nucypher.blockchain.eth.registry import InMemoryContractRegistry
 from nucypher.characters.lawful import Enrico
-from nucypher.policy.conditions.lingo import ConditionLingo, Lingo
+from nucypher.policy.conditions.lingo import Lingo
 from nucypher.utilities.logging import GlobalLoggerSettings
+from nucypher_core.ferveo import DkgPublicKey
+
 from revealer_bot.tmk import TMK, FilePlaintext, decrypt, encapsulate
 
 ######################
@@ -31,11 +33,11 @@ def keygen() -> bytes:
 
 
 @click.command()
+@click.option("--input-dir", type=str, help="Path to the file to be encrypted")
 @click.option(
-    "--input-dir", type=str, help="Path to the file to be encrypted"
-)
-@click.option(
-    "--spill-secret-hazmat-hazmat-i-know-what-i-am-doing", is_flag=True, help="Spill the secret to stdout",
+    "--spill-secret-hazmat-hazmat-i-know-what-i-am-doing",
+    is_flag=True,
+    help="Spill the secret to stdout",
 )
 @click.option(
     "--ritual-id",
@@ -50,35 +52,16 @@ def keygen() -> bytes:
     default="mumbai",
     help="Network for the coordinator",
     show_default=True,
-    type=click.Choice(["mumbai", "rinkeby", "mainnet", "goerli", "ropsten", "kovan"]),
-)
-@click.option("--chain", type=int, help="Ethereum chain ID", default=80001, show_default=True)
-@click.option(
-    "--eth-address",
-    type=str,
-    help="Ethereum address for balance check",
-    default="0x210eeAC07542F815ebB6FD6689637D8cA2689392",
-    show_default=True,
-)
-@click.option(
-    "--eth-minimum-balance",
-    type=float,
-    help="Ethereum minimum balance condition",
-    default=0,
-    show_default=True,
+    type=click.Choice(["mumbai", "tapir", "polygon", "lynx"]),
 )
 @click.option("--output-dir", type=str, required=False, help="Output file for encrypted data")
 def main(
-        input_dir: str,
-        ritual_id: int,
-        coordinator_provider_uri: str,
-        coordinator_network: str,
-        chain: int,
-        eth_address: str,
-        eth_minimum_balance: float,
-        output_dir: str,
-        spill_secret_hazmat_hazmat_i_know_what_i_am_doing: bool,
-
+    input_dir: str,
+    ritual_id: int,
+    coordinator_provider_uri: str,
+    coordinator_network: str,
+    output_dir: str,
+    spill_secret_hazmat_hazmat_i_know_what_i_am_doing: bool,
 ):
     if output_dir is None:
         output_dir = input_dir
@@ -92,7 +75,9 @@ def main(
         with open(file_path, "rb") as f:
             file_content = f.read()
 
-        file_plaintext = FilePlaintext(file_content=file_content, metadata={"filename": file_path.name})
+        file_plaintext = FilePlaintext(
+            file_content=file_content, metadata={"filename": file_path.name}
+        )
         file_plaintexts.append(file_plaintext)
 
     plaintext_of_sym_key = keygen()
@@ -114,24 +99,32 @@ def main(
         f"from Coordinator {coordinator_agent.contract.address}"
     )
 
-    eth_balance_condition: Lingo = {
-        "version": ConditionLingo.VERSION,
+    is_material_released_condition: Lingo = {
+        "version": "1.0.0",
         "condition": {
-            "conditionType": 'rpc',
-            "chain": chain,
-            "method": "eth_getBalance",
-            "parameters": [eth_address, "latest"],
-            "returnValueTest": {"comparator": ">=", "value": eth_minimum_balance},
+            "conditionType": "contract",
+            # Contract with min bid of 0.001 ETH and threshold of 0.1 ETH
+            "contractAddress": "0xb96A231384eEeA72A0EDF8b2e896FA4BaCAa22fF",
+            # Contract with min bid of 0.1 ETH and threshold of 10 ETH
+            # "contractAddress": "0x6Fc000Ba711d333427670482853A4604A3Bc0E03",
+            "functionAbi": {
+                "inputs": [],
+                "name": "materialReleaseConditionMet",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function",
+            },  # type: ignore
+            "method": "materialReleaseConditionMet",
+            "chain": 5,
+            "returnValueTest": {"comparator": "==", "value": True},
         },
     }
 
     ciphertext_of_sym_key = enrico.encrypt_for_dkg(
-        plaintext=plaintext_of_sym_key, conditions=eth_balance_condition
+        plaintext=plaintext_of_sym_key, conditions=is_material_released_condition
     )
 
     # Encrypt all the files in the directory
-
-    payloads = {}
 
     for plaintext in file_plaintexts:
         filename_to_encrypt = plaintext.metadata["filename"]
@@ -140,7 +133,7 @@ def main(
         tmk = TMK(
             bulk_ciphertext=payload,
             encrypted_sym_key=bytes(ciphertext_of_sym_key),
-            conditions=eth_balance_condition,
+            conditions=is_material_released_condition,
         )
 
         # We'll write to the output_path for this filename
@@ -165,6 +158,14 @@ def main(
         assert hopefully_payload.file_content == plaintext.file_content
 
     print("Keccak hash of plaintext sym key: ", secret_hash.hex())
+    print("Ciphertext of sym key: ", bytes(ciphertext_of_sym_key).hex())
+
+    with open(Path(output_dir) / "encryption_metadata.json", "w") as f:
+        encryption_metadata = {
+            "ciphertext": bytes(ciphertext_of_sym_key).hex(),
+            "secret_hash": secret_hash.hex(),
+        }
+        f.write(json.dumps(encryption_metadata, indent=4))
 
     if spill_secret_hazmat_hazmat_i_know_what_i_am_doing:
         print("Here is the sym key:")
