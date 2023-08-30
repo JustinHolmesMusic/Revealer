@@ -45,9 +45,7 @@ class TMK:
     encrypted_sym_key: bytes
     conditions: Lingo
 
-    def __init__(
-        self, bulk_ciphertext: BulkCipherText, encrypted_sym_key: bytes, conditions: Lingo
-    ) -> None:
+    def __init__(self, bulk_ciphertext: BulkCipherText, encrypted_sym_key: bytes, conditions: Lingo) -> None:
         self.bulk_ciphertext = bulk_ciphertext
         self.encrypted_sym_key = encrypted_sym_key
         self.conditions = conditions

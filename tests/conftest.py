@@ -38,12 +38,13 @@ def threshold():
 @pytest.fixture
 def contribution(project, beneficiary, owner, countdownPeriod, threshold, amb):
     return owner.deploy(
-        project.Contribution,
-        countdownPeriod,
-        threshold,
-        Web3.to_wei(0.1, "ether"),
+        project.Contribution,  # contract name
+        countdownPeriod,  # countdown period
+        threshold,  # threshold
+        Web3.to_wei(0.1, "ether"),  # min contribution
+        60 * 60 * 24 * 14,  # initial window (14 days)
         beneficiary,
-        False,
+        False,  # testnet mode
     )
 
 
@@ -120,6 +121,8 @@ def encrypt(coordinator_provider_uri, coordinator_network, contract_address):
 
 
 TESTERCHAIN_CHAIN_ID = 131277322940537
+
+
 @pytest.fixture(scope="session", autouse=True)
 def mock_condition_blockchains(session_mocker):
     """adds testerchain's chain ID to permitted conditional chains"""

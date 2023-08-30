@@ -13,6 +13,7 @@ contract Contribution {
     uint256 public countdownPeriod;
     uint256 public threshold;
     uint256 public minContribution;
+    uint256 public initialWindow;  // TODO: Constant?
 
     // commit and reveal
     bool public isKeySet = false;
@@ -41,6 +42,7 @@ contract Contribution {
         uint256 _countdownPeriod,
         uint256 _threshold,
         uint256 _minContribution,
+        uint256 _initialWindow,
         address payable _beneficiary,
         bool _testnet
     ) {
@@ -51,6 +53,7 @@ contract Contribution {
         threshold = _threshold;
         minContribution = _minContribution;
         testnet = _testnet;
+        initialWindow = _initialWindow;  // 2 weeks
     }
 
     modifier onlyOwner() {
@@ -101,6 +104,7 @@ contract Contribution {
         keyPlaintextHash = _hash;
         keyCiphertext = _ciphertext;
         isKeySet = true;
+        deadline = block.timestamp + initialWindow; // The initial window begins now and lasts initialWindow seconds.
     }
 
     function revealSecret(bytes memory secret) external {
@@ -127,8 +131,13 @@ contract Contribution {
         }
 
         if (materialReleaseConditionMet) {
-            deadline = block.timestamp + countdownPeriod;
-            emit ClockReset(deadline);
+
+            // If the deadline is within the countdownPeriod, extend it by countdownPeriod.
+            if (deadline - block.timestamp < countdownPeriod) {
+                deadline = block.timestamp + countdownPeriod;
+                emit ClockReset(deadline);
+            }
+
         }
         emit Contribute(msg.sender, msg.value);
     }
