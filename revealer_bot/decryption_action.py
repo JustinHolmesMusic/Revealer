@@ -14,9 +14,7 @@ async def decrypt_attached_tmk(message):
     if message.attachments:
         url = message.attachments[0].url
         tmk_filename = message.attachments[0].filename
-        await message.reply(
-            f"OK!  I'll try to see if {tmk_filename} can be decrypted using Threshold Network."
-        )
+        await message.reply(f"OK!  I'll try to see if {tmk_filename} can be decrypted using Threshold Network.")
         attachment_response = requests.get(url)
 
         try:
@@ -47,9 +45,7 @@ async def decrypt_attached_tmk(message):
             return
 
         plaintext_of_symkey = bytes(plaintext_of_symkey)
-        cleartext = decrypt(
-            ciphertext=tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_symkey
-        )
+        cleartext = decrypt(ciphertext=tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_symkey)
         payload = FilePlaintext.from_bytes(cleartext)
         filelike = io.BytesIO(payload.file_content)
 

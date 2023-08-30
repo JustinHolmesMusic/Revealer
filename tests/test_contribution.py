@@ -51,9 +51,7 @@ def test_properties(
 
 
 @pytest.fixture
-def commit_secret(
-    contribution: ape.Contract, owner: ape.Account, dummy_key_ciphertext_base64, dummy_key_hash
-):
+def commit_secret(contribution: ape.Contract, owner: ape.Account, dummy_key_ciphertext_base64, dummy_key_hash):
     contribution.commitSecret(dummy_key_hash, dummy_key_ciphertext_base64, sender=owner)
 
 
@@ -188,9 +186,7 @@ def test_album_release(
 
 
 @pytest.mark.usefixtures("commit_secret")
-def test_contribute_mapping(
-    contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account
-):
+def test_contribute_mapping(contribution: ape.Contract, owner: ape.Account, not_owner: ape.Account):
     contribution.contribute(sender=not_owner, value=Web3.to_wei(1, "ether"))
     assert contribution.balance == Web3.to_wei(1, "ether")
     assert contribution.totalContributedByAddress(not_owner) == Web3.to_wei(1, "ether")
@@ -251,10 +247,7 @@ def test_withdraw_funds_after_deadline_threshold_not_met(
     # this doesn't work because of the gas cost
     # assert beneficiary.balance == beneficiary_balance_before + contribution_amount * 2
 
-    assert (
-        beneficiary.balance
-        >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
-    )
+    assert beneficiary.balance >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
     assert contribution.balance == 0
 
 
@@ -285,10 +278,7 @@ def test_withdraw_funds_after_deadline_fulfilled_threshold(
     # this doesn't work because of the gas cost
     # assert beneficiary.balance == beneficiary_balance_before + contribution_amount * 2
 
-    assert (
-        beneficiary.balance
-        >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
-    )
+    assert beneficiary.balance >= beneficiary_balance_before + contribution_amount * 2 - threshold // 10
     assert contribution.balance == 0
 
 
@@ -326,20 +316,8 @@ def test_contributors_collation(
 
     contribution_metadata_part_two = contribution.getAllContributions()
 
-    contributions_by_address_after_first_contributor_took_the_lead = calculate_leaders(
-        contribution_metadata_part_two
-    )
+    contributions_by_address_after_first_contributor_took_the_lead = calculate_leaders(contribution_metadata_part_two)
 
-    assert (
-        contributions_by_address_after_first_contributor_took_the_lead[first_contributor.address][
-            0
-        ]
-        == two_and_a_half_ether
-    )
+    assert contributions_by_address_after_first_contributor_took_the_lead[first_contributor.address][0] == two_and_a_half_ether
 
-    assert (
-        contributions_by_address_after_first_contributor_took_the_lead[second_contributor.address][
-            0
-        ]
-        == two_ether
-    )
+    assert contributions_by_address_after_first_contributor_took_the_lead[second_contributor.address][0] == two_ether

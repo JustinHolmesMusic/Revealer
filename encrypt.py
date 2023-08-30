@@ -44,9 +44,7 @@ def keygen() -> bytes:
     type=int,
     help="Ritual ID obtained from a side channel",
 )
-@click.option(
-    "--coordinator-provider-uri", type=str, help="URI of the coordinator provider", required=True
-)
+@click.option("--coordinator-provider-uri", type=str, help="URI of the coordinator provider", required=True)
 @click.option(
     "--coordinator-network",
     default="mumbai",
@@ -75,9 +73,7 @@ def main(
         with open(file_path, "rb") as f:
             file_content = f.read()
 
-        file_plaintext = FilePlaintext(
-            file_content=file_content, metadata={"filename": file_path.name}
-        )
+        file_plaintext = FilePlaintext(file_content=file_content, metadata={"filename": file_path.name})
         file_plaintexts.append(file_plaintext)
 
     plaintext_of_sym_key = keygen()
@@ -120,9 +116,7 @@ def main(
         },
     }
 
-    ciphertext_of_sym_key = enrico.encrypt_for_dkg(
-        plaintext=plaintext_of_sym_key, conditions=is_material_released_condition
-    )
+    ciphertext_of_sym_key = enrico.encrypt_for_dkg(plaintext=plaintext_of_sym_key, conditions=is_material_released_condition)
 
     # Encrypt all the files in the directory
 
@@ -150,9 +144,7 @@ def main(
         ################
 
         hopefully_tmk = TMK.from_bytes(data)
-        hopefully_cleartext = decrypt(
-            ciphertext=hopefully_tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_sym_key
-        )
+        hopefully_cleartext = decrypt(ciphertext=hopefully_tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_sym_key)
         hopefully_payload = FilePlaintext.from_bytes(hopefully_cleartext)
         assert hopefully_payload.metadata["filename"] == filename_to_encrypt
         assert hopefully_payload.file_content == plaintext.file_content
