@@ -27,7 +27,7 @@ contract Contribution {
     bool[] public contributionIsCombined;
     uint256[] public contributionAmounts;
     uint256[] public contributionDatetimes;
-    address[] public contributorsForEachAContribution;
+    address[] public contributorsForEachContribution;
 
     address public artifactContract;
 
@@ -117,7 +117,7 @@ contract Contribution {
             "Contribution must be equal to or greater than the minimum.");
 
         contributionAmounts.push(msg.value);
-        contributorsForEachAContribution.push(msg.sender);
+        contributorsForEachContribution.push(msg.sender);
         contributionIsCombined.push(combine);
         contributionDatetimes.push(block.timestamp);
 
@@ -143,8 +143,8 @@ contract Contribution {
 
     function totalContributedByAddress(address contributor) external view returns (uint256) {
         uint256 total = 0;
-        for (uint256 i = 0; i < contributorsForEachAContribution.length; i++) {
-            if (contributorsForEachAContribution[i] == contributor) {
+        for (uint256 i = 0; i < contributorsForEachContribution.length; i++) {
+            if (contributorsForEachContribution[i] == contributor) {
                 total += contributionAmounts[i];
             }
         }
@@ -165,7 +165,7 @@ contract Contribution {
 
     function getAllContributions() external view returns (address[] memory, uint256[] memory, bool[] memory, uint256[] memory) {
 
-        return (contributorsForEachAContribution, contributionAmounts, contributionIsCombined, contributionDatetimes);
+        return (contributorsForEachContribution, contributionAmounts, contributionIsCombined, contributionDatetimes);
     }
 
     function withdraw() external onlyBeneficiary {
