@@ -1,5 +1,6 @@
-from pathlib import Path
 import json
+from pathlib import Path
+
 import click
 from cryptography.fernet import Fernet
 from eth_utils import keccak  # type: ignore
@@ -102,10 +103,8 @@ def main(
         "version": "1.0.0",
         "condition": {
             "conditionType": "contract",
-
             # Contract with min bid of 0.001 ETH and threshold of 0.1 ETH
-            "contractAddress": "0xb96A231384eEeA72A0EDF8b2e896FA4BaCAa22fF", 
-
+            "contractAddress": "0xb96A231384eEeA72A0EDF8b2e896FA4BaCAa22fF",
             # Contract with min bid of 0.1 ETH and threshold of 10 ETH
             # "contractAddress": "0x6Fc000Ba711d333427670482853A4604A3Bc0E03",
             "functionAbi": {
@@ -126,8 +125,6 @@ def main(
     )
 
     # Encrypt all the files in the directory
-
-    payloads = {}
 
     for plaintext in file_plaintexts:
         filename_to_encrypt = plaintext.metadata["filename"]

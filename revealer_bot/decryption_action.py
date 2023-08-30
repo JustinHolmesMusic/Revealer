@@ -2,8 +2,9 @@ import io
 
 import discord
 import requests
-from nucypher_core import ferveo
 from nucypher.characters.lawful import Ursula
+from nucypher_core import ferveo
+
 from revealer_bot.bob_and_other_networky_things import bob
 from revealer_bot.tmk import TMK, FilePlaintext, decrypt
 
@@ -28,7 +29,7 @@ async def decrypt_attached_tmk(message):
         ciphertext_to_decrypt_with_threshold = ferveo.Ciphertext.from_bytes(tmk.encrypted_sym_key)
 
         ######### BAAAAAAHB ########
-        
+
         try:
             plaintext_of_symkey = bob.threshold_decrypt(
                 ritual_id=91,  # Cuz 91
@@ -44,7 +45,6 @@ async def decrypt_attached_tmk(message):
 
             await message.reply(error_message)
             return
-
 
         plaintext_of_symkey = bytes(plaintext_of_symkey)
         cleartext = decrypt(
