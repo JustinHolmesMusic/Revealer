@@ -2,3 +2,4 @@ discord.py
 python-dotenv
 eth-ape
 git+https://github.com/nucypher/nucypher.git@development#egg=nucypher[dev]
+web3

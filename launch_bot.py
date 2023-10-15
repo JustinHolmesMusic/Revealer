@@ -1,9 +1,6 @@
-import os
-
 from dotenv import load_dotenv
 
-from revealer_bot.bob_and_other_networky_things import bob
-from revealer_bot.bot_lair import the_actual_revealer_bot
+from revealer.bob_and_other_networky_things import bob
 from revealer_bot.revealer_commands import *  # noqa
 
 load_dotenv()
@@ -18,4 +15,5 @@ async def on_ready():
 
 
 the_actual_revealer_bot.run(bot_token)
+print("Bot is running - now starting learning loop.")
 bob.start_learning_loop()
