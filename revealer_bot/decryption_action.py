@@ -3,10 +3,9 @@ import io
 import discord
 import requests
 from nucypher.characters.lawful import Ursula
-from nucypher_core import ferveo
-
-from revealer_bot.bob_and_other_networky_things import bob
+from revealer.bob_and_other_networky_things import bob
 from revealer_bot.tmk import TMK, FilePlaintext, decrypt
+from nucypher_core import ferveo
 
 
 async def decrypt_attached_tmk(message):
@@ -43,6 +42,8 @@ async def decrypt_attached_tmk(message):
 
             await message.reply(error_message)
             return
+        except Ursula.NotEnoughTeachers as e:
+            await message.reply(e.args[0])
 
         plaintext_of_symkey = bytes(plaintext_of_symkey)
         cleartext = decrypt(ciphertext=tmk.bulk_ciphertext, plaintext_of_symkey=plaintext_of_symkey)
