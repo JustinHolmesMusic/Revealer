@@ -7,7 +7,7 @@ from eth_utils import keccak  # type: ignore
 from nucypher.blockchain.eth.agents import CoordinatorAgent
 from nucypher.blockchain.eth.registry import InMemoryContractRegistry
 from nucypher.characters.lawful import Enrico
-from nucypher.policy.conditions.lingo import Lingo
+from revealer.conditions import is_material_released_condition
 from nucypher.utilities.logging import GlobalLoggerSettings
 from nucypher_core.ferveo import DkgPublicKey
 
@@ -61,21 +61,25 @@ def main(
     output_dir: str,
     spill_secret_hazmat_hazmat_i_know_what_i_am_doing: bool,
 ):
-    if output_dir is None:
-        output_dir = input_dir
-
-    # Iterate through the files in input_dir
-    dir_path = Path(input_dir)
+    return
+def main():
+    # if output_dir is None:
+    #     output_dir = input_dir
+    #
+    # # Iterate through the files in input_dir
+    # dir_path = Path(input_dir)
 
     file_plaintexts = []
 
-    for file_path in dir_path.iterdir():
-        with open(file_path, "rb") as f:
-            file_content = f.read()
-
-        file_plaintext = FilePlaintext(file_content=file_content, metadata={"filename": file_path.name})
-        file_plaintexts.append(file_plaintext)
-
+    # for file_path in dir_path.iterdir():
+    #     with open(file_path, "rb") as f:
+    #         file_content = f.read()
+    #
+    #     file_plaintext = FilePlaintext(file_content=file_content, metadata={"filename": file_path.name})
+    #     file_plaintexts.append(file_plaintext)
+    ritual_id = 91
+    coordinator_provider_uri = "https://polygon-mumbai.infura.io/v3/a11313ddcf61443898b6a47e952d255c"
+    coordinator_network = "mumbai"
     plaintext_of_sym_key = keygen()
 
     secret_hash = keccak(plaintext_of_sym_key)
@@ -95,26 +99,11 @@ def main(
         f"from Coordinator {coordinator_agent.contract.address}"
     )
 
-    is_material_released_condition: Lingo = {
-        "version": "1.0.0",
-        "condition": {
-            "conditionType": "contract",
-            "contractAddress": "0x96ebdf35199219BDd16E3c3E1aD8C89C9185b734",  # contract with initialWindow
-            "functionAbi": {
-                "inputs": [],
-                "name": "materialReleaseConditionMet",
-                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-                "stateMutability": "view",
-                "type": "function",
-            },  # type: ignore
-            "method": "materialReleaseConditionMet",
-            "chain": 5,
-            "returnValueTest": {"comparator": "==", "value": True},
-        },
-    }
-
     ciphertext_of_sym_key = enrico.encrypt_for_dkg(plaintext=plaintext_of_sym_key, conditions=is_material_released_condition)
-
+    encryption_metadata = {
+        "ciphertext": bytes(ciphertext_of_sym_key).hex(),
+        "secret_hash": secret_hash.hex(),
+    }
     # Encrypt all the files in the directory
 
     for plaintext in file_plaintexts:
@@ -150,10 +139,6 @@ def main(
     print("Ciphertext of sym key: ", bytes(ciphertext_of_sym_key).hex())
 
     with open(Path(output_dir) / "encryption_metadata.json", "w") as f:
-        encryption_metadata = {
-            "ciphertext": bytes(ciphertext_of_sym_key).hex(),
-            "secret_hash": secret_hash.hex(),
-        }
         f.write(json.dumps(encryption_metadata, indent=4))
 
     if spill_secret_hazmat_hazmat_i_know_what_i_am_doing:
