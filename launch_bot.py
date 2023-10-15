@@ -1,9 +1,6 @@
-from dotenv import load_dotenv
-
+import os
 from revealer.bob_and_other_networky_things import bob
 from revealer_bot.revealer_commands import *  # noqa
-
-load_dotenv()
 
 bot_token = os.environ["DISCORD_BOT_TOKEN"]
 
